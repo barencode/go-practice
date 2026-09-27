@@ -46,3 +46,21 @@ func TestMineShiftsNegativeProduction(t *testing.T) {
 		t.Errorf("mineShifts(5, 3, -2) = %d; want %d", got, want)
 	}
 }
+
+func TestMineShiftsZeroShifts(t *testing.T) {
+	got := mineShifts(0, 3, 2)
+	want := 0
+
+	if got != want {
+		t.Errorf("mineShifts(0, 3, 2) = %d; want %d", got, want)
+	}
+}
+
+func TestMineShiftNegativeShifts(t *testing.T) {
+	got := mineShifts(-1, 3, 2)
+	want := 0
+
+	if got != want {
+		t.Errorf("mineShifts(-1, 3, 2) = %d; want %d", got, want)
+	}
+}
