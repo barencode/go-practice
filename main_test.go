@@ -64,3 +64,22 @@ func TestMineShiftsNegativeShifts(t *testing.T) {
 		t.Errorf("mineShifts(-1, 3, 2) = %d; want %d", got, want)
 	}
 }
+
+func TestSummarizeProductionEmpty(t *testing.T) {
+	gotBalance, gotShifts := summarizeProduction([]int{})
+	want := 0
+
+	if gotBalance != want || gotShifts != want {
+		t.Errorf("summarizeProduction([]int{}) = %d; %d shifts, want %d", gotBalance, gotShifts, want)
+	}
+}
+
+func TestSummarizeProductionMixed(t *testing.T) {
+	gotBalance, gotShifts := summarizeProduction([]int{3, 0, 5, 0, 2})
+	wantBalance := 10
+	wantShifts := 3
+
+	if gotBalance != wantBalance || gotShifts != wantShifts {
+		t.Errorf("summarizeProduction([]int{3, 0, 5, 0, 2}) = %d; %d shifts, want balance %d, with %d shifts", gotBalance, gotShifts, wantBalance, wantShifts)
+	}
+}
