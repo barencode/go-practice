@@ -56,7 +56,7 @@ func TestMineShiftsZeroShifts(t *testing.T) {
 	}
 }
 
-func TestMineShiftNegativeShifts(t *testing.T) {
+func TestMineShiftsNegativeShifts(t *testing.T) {
 	got := mineShifts(-1, 3, 2)
 	want := 0
 
