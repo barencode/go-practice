@@ -24,3 +24,15 @@ func mineShifts(shifts int, maintenanceShift int, production int) int {
 	}
 	return balance
 }
+
+func summarizeProduction(production []int) (int, int) {
+	balance := 0
+	workingShifts := 0
+	for _, coal := range production {
+		balance += coal
+		if coal > 0 {
+			workingShifts++
+		}
+	}
+	return balance, workingShifts
+}
