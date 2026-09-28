@@ -83,3 +83,20 @@ func TestSummarizeProductionMixed(t *testing.T) {
 		t.Errorf("summarizeProduction([]int{3, 0, 5, 0, 2}) = %d; %d shifts, want balance %d, with %d shifts", gotBalance, gotShifts, wantBalance, wantShifts)
 	}
 }
+
+func TestBuildProductionMaintenance(t *testing.T) {
+	got := buildProduction(5, 3, 2)
+	if len(got) != 5 {
+		t.Fatalf("len = %d; want 5; production = %v", len(got), got)
+	}
+
+	for i := range got {
+		want := 2
+		if i == 2 {
+			want = 0
+		}
+		if got[i] != want {
+			t.Errorf("production[%d] = %d; want %d", i, got[i], want)
+		}
+	}
+}

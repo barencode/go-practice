@@ -36,3 +36,15 @@ func summarizeProduction(production []int) (int, int) {
 	}
 	return balance, workingShifts
 }
+
+func buildProduction(shifts int, maintenanceShift int, coalPerShift int) []int {
+	production := []int{}
+	for shift := 1; shift <= shifts; shift++ {
+		if shift == maintenanceShift {
+			production = append(production, 0)
+		} else {
+			production = append(production, coalPerShift)
+		}
+	}
+	return production
+}
