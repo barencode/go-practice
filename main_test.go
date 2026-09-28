@@ -100,3 +100,17 @@ func TestBuildProductionMaintenance(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildProductionWithoutMaintenance(t *testing.T) {
+	got := buildProduction(3, 5, 2)
+	if len(got) != 3 {
+		t.Fatalf("len = %d; want 3, production = %v", len(got), got)
+	}
+
+	for i := range got {
+		want := 2
+		if got[i] != want {
+			t.Errorf("production[%d] = %d; want %d", i, got[i], want)
+		}
+	}
+}
