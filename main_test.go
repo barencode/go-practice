@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMineShiftsWithMaintenance(t *testing.T) {
 	got := mineShifts(5, 3, 2)
@@ -159,5 +161,45 @@ func TestMineRound(t *testing.T) {
 	}
 	if miners[1].Energy != 0 {
 		t.Errorf("Anna energy = %d; want %d", miners[1].Energy, 0)
+	}
+}
+
+func TestMineRoundUntilExhausted(t *testing.T) {
+	team := []Miner{
+		{Name: "Борис", Energy: 2, Production: 3},
+		{Name: "Анна", Energy: 1, Production: 5},
+	}
+
+	got := mineRound(team) // Cycle 1
+	if got != 8 {
+		t.Errorf("Round 1 production = %d; want %d", got, 8)
+	}
+	if team[0].Energy != 1 {
+		t.Errorf("Round 1 Boris energy = %d; want %d", team[0].Energy, 1)
+	}
+	if team[1].Energy != 0 {
+		t.Errorf("Round 1 Anna energy = %d; want %d", team[1].Energy, 0)
+	}
+
+	got = mineRound(team) // Cycle 2
+	if got != 3 {
+		t.Errorf("Round 2 production = %d; want %d", got, 3)
+	}
+	if team[0].Energy != 0 {
+		t.Errorf("Round 2 Boris energy = %d; want %d", team[0].Energy, 0)
+	}
+	if team[1].Energy != 0 {
+		t.Errorf("Round 2 Anna energy = %d; want %d", team[1].Energy, 0)
+	}
+
+	got = mineRound(team) // Cycle 3
+	if got != 0 {
+		t.Errorf("Round 3 production = %d; want %d", got, 0)
+	}
+	if team[0].Energy != 0 {
+		t.Errorf("Round 3 Boris energy = %d; want %d", team[0].Energy, 0)
+	}
+	if team[1].Energy != 0 {
+		t.Errorf("Round 3 Anna energy = %d; want %d", team[1].Energy, 0)
 	}
 }
