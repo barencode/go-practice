@@ -121,7 +121,7 @@ func TestMineOnceWithEnergy(t *testing.T) {
 		Energy:     2,
 		Production: 3,
 	}
-	got := mineOnce(&gotMiner)
+	got := gotMiner.MineOnce()
 	if got != 3 {
 		t.Errorf("production = %d; want %d", got, 3)
 	}
@@ -136,7 +136,7 @@ func TestMineOnceWithoutEnergy(t *testing.T) {
 		Energy:     0,
 		Production: 2,
 	}
-	got := mineOnce(&gotMiner)
+	got := gotMiner.MineOnce()
 	if got != 0 {
 		t.Errorf("production = %d; want %d", got, 0)
 	}
