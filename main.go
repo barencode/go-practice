@@ -3,10 +3,20 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(mineShifts(5, 3, 2))
-	fmt.Println(mineShifts(5, 8, 2))
-	fmt.Println(mineShifts(1, 1, 2))
-	fmt.Println(mineShifts(5, 3, 0))
+	balance := 0
+
+	miner := Miner{
+		Name:       "Борис",
+		Energy:     3,
+		Production: 2,
+	}
+
+	for miner.Energy > 0 {
+		balance += miner.Production
+		miner.Energy--
+	}
+
+	fmt.Println(miner.Name, "has complete his work and has", miner.Energy, "energy left. Total coal mined is:", balance)
 }
 
 func mineShifts(shifts int, maintenanceShift int, production int) int {
@@ -47,4 +57,18 @@ func buildProduction(shifts int, maintenanceShift int, coalPerShift int) []int {
 		}
 	}
 	return production
+}
+
+type Miner struct {
+	Name       string
+	Energy     int
+	Production int
+}
+
+func mineOnce(miner *Miner) int {
+	if miner.Energy <= 0 {
+		return 0
+	}
+	miner.Energy--
+	return miner.Production
 }
