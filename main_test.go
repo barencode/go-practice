@@ -144,3 +144,20 @@ func TestMineOnceWithoutEnergy(t *testing.T) {
 		t.Errorf("energy left = %d; want %d", gotMiner.Energy, 0)
 	}
 }
+
+func TestMineRound(t *testing.T) {
+	miners := []Miner{
+		{Name: "Борис", Energy: 2, Production: 3},
+		{Name: "Анна", Energy: 1, Production: 5},
+	}
+	got := mineRound(miners)
+	if got != 8 {
+		t.Errorf("production = %d; want %d", got, 8)
+	}
+	if miners[0].Energy != 1 {
+		t.Errorf("Boris energy = %d; want %d", miners[0].Energy, 1)
+	}
+	if miners[1].Energy != 0 {
+		t.Errorf("Anna energy = %d; want %d", miners[1].Energy, 0)
+	}
+}
