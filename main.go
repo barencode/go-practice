@@ -12,7 +12,7 @@ func main() {
 	}
 
 	for miner.Energy > 0 {
-		balance += mineOnce(&miner)
+		balance += miner.MineOnce()
 	}
 
 	fmt.Println(miner.Name, "has complete his work and has", miner.Energy, "energy left. Total coal mined is:", balance)
@@ -65,6 +65,14 @@ type Miner struct {
 }
 
 func mineOnce(miner *Miner) int {
+	if miner.Energy <= 0 {
+		return 0
+	}
+	miner.Energy--
+	return miner.Production
+}
+
+func (miner *Miner) MineOnce() int {
 	if miner.Energy <= 0 {
 		return 0
 	}
