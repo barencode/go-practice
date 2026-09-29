@@ -64,14 +64,6 @@ type Miner struct {
 	Production int
 }
 
-func mineOnce(miner *Miner) int {
-	if miner.Energy <= 0 {
-		return 0
-	}
-	miner.Energy--
-	return miner.Production
-}
-
 func (miner *Miner) MineOnce() int {
 	if miner.Energy <= 0 {
 		return 0
