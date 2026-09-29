@@ -12,8 +12,7 @@ func main() {
 	}
 
 	for miner.Energy > 0 {
-		balance += miner.Production
-		miner.Energy--
+		balance += mineOnce(&miner)
 	}
 
 	fmt.Println(miner.Name, "has complete his work and has", miner.Energy, "energy left. Total coal mined is:", balance)
