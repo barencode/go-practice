@@ -3,19 +3,16 @@ package main
 import "fmt"
 
 func main() {
-	balance := 0
-
-	miner := Miner{
-		Name:       "Борис",
-		Energy:     3,
-		Production: 2,
+	miners := []Miner{
+		{Name: "Борис", Energy: 2, Production: 3},
+		{Name: "Анна", Energy: 1, Production: 5},
 	}
 
-	for miner.Energy > 0 {
-		balance += miner.MineOnce()
-	}
+	total := 0
+	total += mineRound(miners)
+	total += mineRound(miners)
 
-	fmt.Println(miner.Name, "has complete his work and has", miner.Energy, "energy left. Total coal mined is:", balance)
+	fmt.Println("Total balance:", total, ". Boris' energy:", miners[0].Energy, ". Annas energy:", miners[1].Energy)
 }
 
 func mineShifts(shifts int, maintenanceShift int, production int) int {
@@ -70,4 +67,14 @@ func (miner *Miner) MineOnce() int {
 	}
 	miner.Energy--
 	return miner.Production
+}
+
+func mineRound(miners []Miner) int {
+	balance := 0
+
+	for i := range miners {
+		balance += miners[i].MineOnce()
+	}
+
+	return balance
 }
