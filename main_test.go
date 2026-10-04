@@ -4,6 +4,12 @@ import (
 	"testing"
 )
 
+type RoundExpectation struct {
+	Production  int
+	BorisEnergy int
+	AnnaEnergy  int
+}
+
 func TestMineShiftsWithMaintenance(t *testing.T) {
 	got := mineShifts(5, 3, 2)
 	want := 8
@@ -170,36 +176,22 @@ func TestMineRoundUntilExhausted(t *testing.T) {
 		{Name: "Анна", Energy: 1, Production: 5},
 	}
 
-	got := mineRound(team) // Cycle 1
-	if got != 8 {
-		t.Errorf("Round 1 production = %d; want %d", got, 8)
-	}
-	if team[0].Energy != 1 {
-		t.Errorf("Round 1 Boris energy = %d; want %d", team[0].Energy, 1)
-	}
-	if team[1].Energy != 0 {
-		t.Errorf("Round 1 Anna energy = %d; want %d", team[1].Energy, 0)
+	expectations := []RoundExpectation{
+		{Production: 8, BorisEnergy: 1, AnnaEnergy: 0},
+		{Production: 3, BorisEnergy: 0, AnnaEnergy: 0},
+		{Production: 0, BorisEnergy: 0, AnnaEnergy: 0},
 	}
 
-	got = mineRound(team) // Cycle 2
-	if got != 3 {
-		t.Errorf("Round 2 production = %d; want %d", got, 3)
-	}
-	if team[0].Energy != 0 {
-		t.Errorf("Round 2 Boris energy = %d; want %d", team[0].Energy, 0)
-	}
-	if team[1].Energy != 0 {
-		t.Errorf("Round 2 Anna energy = %d; want %d", team[1].Energy, 0)
-	}
-
-	got = mineRound(team) // Cycle 3
-	if got != 0 {
-		t.Errorf("Round 3 production = %d; want %d", got, 0)
-	}
-	if team[0].Energy != 0 {
-		t.Errorf("Round 3 Boris energy = %d; want %d", team[0].Energy, 0)
-	}
-	if team[1].Energy != 0 {
-		t.Errorf("Round 3 Anna energy = %d; want %d", team[1].Energy, 0)
+	for i, want := range expectations {
+		got := mineRound(team)
+		if got != want.Production {
+			t.Errorf("in the cycle %d got %d; want %d", i+1, got, want.Production)
+		}
+		if team[0].Energy != want.BorisEnergy {
+			t.Errorf("in the cycle %d 1st miner energy is %d; want %d", i+1, team[0].Energy, want.BorisEnergy)
+		}
+		if team[1].Energy != want.AnnaEnergy {
+			t.Errorf("in the cycle %d 2nd miner energy is %d; want %d", i+1, team[1].Energy, want.AnnaEnergy)
+		}
 	}
 }
