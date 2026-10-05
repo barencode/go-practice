@@ -195,3 +195,32 @@ func TestMineRoundUntilExhausted(t *testing.T) {
 		}
 	}
 }
+
+func TestFindMinerIndex(t *testing.T) {
+	team := []Miner{
+		{Name: "Борис", Energy: 2, Production: 3},
+		{Name: "Анна", Energy: 1, Production: 5},
+		{Name: "Борис", Energy: 4, Production: 2},
+	}
+	requestedName := "Борис"
+	want := 0
+	got := findMinerIndex(team, requestedName)
+
+	if got != want {
+		t.Errorf("got index for %q name: %d; want %d", requestedName, got, want)
+	}
+}
+
+func TestFindMinerIndexNotFound(t *testing.T) {
+	team := []Miner{
+		{Name: "Борис", Energy: 2, Production: 3},
+		{Name: "Анна", Energy: 1, Production: 5},
+	}
+	requestedName := "Иван"
+	want := -1
+	got := findMinerIndex(team, requestedName)
+
+	if got != want {
+		t.Errorf("got index for %q name: %d; want %d", requestedName, got, want)
+	}
+}
