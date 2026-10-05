@@ -224,3 +224,30 @@ func TestFindMinerIndexNotFound(t *testing.T) {
 		t.Errorf("got index for %q name: %d; want %d", requestedName, got, want)
 	}
 }
+
+func TestMineMapRound(t *testing.T) {
+	team := map[int]*Miner{
+		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
+		205: nil,
+		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
+	}
+	got := mineMapRound(team)
+	wantAmount := 8
+	boris := team[101]
+	anna := team[309]
+	empty, exists := team[205]
+
+	if got != wantAmount {
+		t.Errorf("got %d coal mining amount; want %d", got, wantAmount)
+	}
+	if boris.Energy != 1 {
+		t.Errorf("got %d energy of %q; want %d", boris.Energy, boris.Name, 1)
+	}
+	if anna.Energy != 0 {
+		t.Errorf("got %d energy of %q; want %d", anna.Energy, anna.Name, 0)
+	}
+
+	if !exists || empty != nil {
+		t.Errorf("entry 205: exists=%t, value=%v; want true, nil", exists, empty)
+	}
+}
