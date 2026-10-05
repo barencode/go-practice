@@ -87,3 +87,13 @@ func findMinerIndex(miners []Miner, name string) int {
 	}
 	return -1
 }
+
+func mineMapRound(miners map[int]*Miner) int {
+	amount := 0
+	for _, miner := range miners {
+		if miner != nil {
+			amount += miner.MineOnce()
+		}
+	}
+	return amount
+}
