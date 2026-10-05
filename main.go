@@ -78,3 +78,12 @@ func mineRound(miners []Miner) int {
 
 	return balance
 }
+
+func findMinerIndex(miners []Miner, name string) int {
+	for i, miner := range miners {
+		if name == miner.Name {
+			return i
+		}
+	}
+	return -1
+}
