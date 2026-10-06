@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 func main() {
 	miners := []Miner{
@@ -13,6 +16,19 @@ func main() {
 	total += mineRound(miners)
 
 	fmt.Println("Total balance:", total, ". Boris' energy:", miners[0].Energy, ". Annas energy:", miners[1].Energy)
+
+	team := map[int]*Miner{
+		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
+		205: nil,
+		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
+	}
+
+	coal, err := mineByPointerID(team, 999)
+	if err != nil {
+		fmt.Println("Operation caused an error:", err)
+		return
+	}
+	fmt.Println("Coal mined:", coal)
 }
 
 func mineShifts(shifts int, maintenanceShift int, production int) int {
@@ -96,4 +112,12 @@ func mineMapRound(miners map[int]*Miner) int {
 		}
 	}
 	return amount
+}
+
+func mineByPointerID(miners map[int]*Miner, id int) (int, error) {
+	miner, ok := miners[id]
+	if !ok || miner == nil {
+		return 0, errors.New("шахтёр не найден")
+	}
+	return miner.MineOnce(), nil
 }
