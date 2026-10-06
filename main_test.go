@@ -253,42 +253,58 @@ func TestMineMapRound(t *testing.T) {
 	}
 }
 
-func TestMineByPointerIDNotFound(t *testing.T) {
+func TestMineByIDNotFound(t *testing.T) {
 	team := map[int]*Miner{}
-	got, err := mineByPointerID(team, 999, false)
+	testMine := Mine{
+		Miners: team,
+		Closed: false,
+	}
+	got, err := testMine.MineByID(999)
 
 	if got != 0 || !errors.Is(err, ErrMinerNotFound) {
 		t.Errorf("got coal=%d, err=%v; want coal=0, err=%v", got, err, ErrMinerNotFound)
 	}
 }
 
-func TestMineByPointerIDNilMiner(t *testing.T) {
+func TestMineByIDNilMiner(t *testing.T) {
 	team := map[int]*Miner{
 		205: nil,
 	}
-	got, err := mineByPointerID(team, 205, false)
+	testMine := Mine{
+		Miners: team,
+		Closed: false,
+	}
+	got, err := testMine.MineByID(205)
 
 	if got != 0 || !errors.Is(err, ErrMinerNotFound) {
 		t.Errorf("got coal=%d, err=%v; want coal=0 and %v error", got, err, ErrMinerNotFound)
 	}
 }
 
-func TestMineByPointerIDExhausted(t *testing.T) {
+func TestMineByIDExhausted(t *testing.T) {
 	team := map[int]*Miner{
 		101: {Name: "Борис", Energy: 0, Production: 3},
 	}
-	got, err := mineByPointerID(team, 101, false)
+	testMine := Mine{
+		Miners: team,
+		Closed: false,
+	}
+	got, err := testMine.MineByID(101)
 
 	if !(got == 0 && err == nil) {
 		t.Errorf("got coal=%d, err=%v; want coal=0 and nil error", got, err)
 	}
 }
 
-func TestMineByPointerIDWithEnergy(t *testing.T) {
+func TestMineByIDWithEnergy(t *testing.T) {
 	team := map[int]*Miner{
 		101: {Name: "", Energy: 2, Production: 3},
 	}
-	got, err := mineByPointerID(team, 101, false)
+	testMine := Mine{
+		Miners: team,
+		Closed: false,
+	}
+	got, err := testMine.MineByID(101)
 	wantProduction := 3 // equals to production and 1 cycle of mining
 	wantEnergy := 1
 
@@ -297,11 +313,15 @@ func TestMineByPointerIDWithEnergy(t *testing.T) {
 	}
 }
 
-func TestMineByPointerIDClosed(t *testing.T) {
+func TestMineByIDClosed(t *testing.T) {
 	team := map[int]*Miner{
 		101: {Name: "Борис", Energy: 2, Production: 3},
 	}
-	got, err := mineByPointerID(team, 101, true)
+	testMine := Mine{
+		Miners: team,
+		Closed: true,
+	}
+	got, err := testMine.MineByID(101)
 	wantProduction := 0
 	wantEnergy := 2
 
@@ -310,9 +330,13 @@ func TestMineByPointerIDClosed(t *testing.T) {
 	}
 }
 
-func TestMineByPointerIDClosedNotFound(t *testing.T) {
+func TestMineByIDClosedNotFound(t *testing.T) {
 	team := map[int]*Miner{}
-	got, err := mineByPointerID(team, 999, true)
+	testMine := Mine{
+		Miners: team,
+		Closed: true,
+	}
+	got, err := testMine.MineByID(999)
 	wantError := ErrMineClosed
 
 	if got != 0 || !errors.Is(err, wantError) {
