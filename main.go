@@ -5,6 +5,17 @@ import (
 	"fmt"
 )
 
+type Miner struct {
+	Name       string
+	Energy     int
+	Production int
+}
+
+type Mine struct {
+	Miners map[int]*Miner
+	Closed bool
+}
+
 func main() {
 	team := map[int]*Miner{
 		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
@@ -12,7 +23,12 @@ func main() {
 		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
 	}
 
-	coal, err := mineByPointerID(team, 101, false)
+	mine := Mine{
+		Miners: team,
+		Closed: false,
+	}
+
+	coal, err := mine.MineByID(101)
 	if err != nil {
 		if errors.Is(err, ErrMineClosed) {
 			fmt.Println("Добыча остановлена")
@@ -68,12 +84,6 @@ func buildProduction(shifts int, maintenanceShift int, coalPerShift int) []int {
 	return production
 }
 
-type Miner struct {
-	Name       string
-	Energy     int
-	Production int
-}
-
 func (miner *Miner) MineOnce() int {
 	if miner.Energy <= 0 {
 		return 0
@@ -111,11 +121,11 @@ func mineMapRound(miners map[int]*Miner) int {
 	return amount
 }
 
-func mineByPointerID(miners map[int]*Miner, id int, closed bool) (int, error) {
-	if closed {
+func (mine *Mine) MineByID(id int) (int, error) {
+	if mine.Closed {
 		return 0, fmt.Errorf("ошибка шахты: %w", ErrMineClosed)
 	}
-	miner, ok := miners[id]
+	miner, ok := mine.Miners[id]
 	if !ok || miner == nil {
 		return 0, fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
 	}
