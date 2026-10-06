@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -117,7 +116,7 @@ func mineMapRound(miners map[int]*Miner) int {
 func mineByPointerID(miners map[int]*Miner, id int) (int, error) {
 	miner, ok := miners[id]
 	if !ok || miner == nil {
-		return 0, errors.New("шахтёр не найден")
+		return 0, fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
 	}
 	return miner.MineOnce(), nil
 }
