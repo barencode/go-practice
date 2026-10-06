@@ -1,29 +1,27 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
 func main() {
-	miners := []Miner{
-		{Name: "Борис", Energy: 2, Production: 3},
-		{Name: "Анна", Energy: 1, Production: 5},
-	}
-
-	total := 0
-	total += mineRound(miners)
-	total += mineRound(miners)
-
-	fmt.Println("Total balance:", total, ". Boris' energy:", miners[0].Energy, ". Annas energy:", miners[1].Energy)
-
 	team := map[int]*Miner{
 		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
 		205: nil,
 		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
 	}
 
-	coal, err := mineByPointerID(team, 999)
+	coal, err := mineByPointerID(team, 101, false)
 	if err != nil {
+		if errors.Is(err, ErrMineClosed) {
+			fmt.Println("Добыча остановлена")
+			return
+		}
+		if errors.Is(err, ErrMinerNotFound) {
+			fmt.Println("Выберите другого шахтёра")
+			return
+		}
 		fmt.Println("Operation caused an error:", err)
 		return
 	}
@@ -113,7 +111,10 @@ func mineMapRound(miners map[int]*Miner) int {
 	return amount
 }
 
-func mineByPointerID(miners map[int]*Miner, id int) (int, error) {
+func mineByPointerID(miners map[int]*Miner, id int, closed bool) (int, error) {
+	if closed {
+		return 0, fmt.Errorf("ошибка шахты: %w", ErrMineClosed)
+	}
 	miner, ok := miners[id]
 	if !ok || miner == nil {
 		return 0, fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
