@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -256,8 +257,8 @@ func TestMineByPointerIDNotFound(t *testing.T) {
 	team := map[int]*Miner{}
 	got, err := mineByPointerID(team, 999)
 
-	if got != 0 || err == nil {
-		t.Errorf("got coal=%d, err=%v; want coal=0 and non-nil error", got, err)
+	if got != 0 || !errors.Is(err, ErrMinerNotFound) {
+		t.Errorf("got coal=%d, err=%v; want coal=0, err=%v", got, err, ErrMinerNotFound)
 	}
 }
 
@@ -267,8 +268,8 @@ func TestMineByPointerIDNilMiner(t *testing.T) {
 	}
 	got, err := mineByPointerID(team, 205)
 
-	if got != 0 || err == nil {
-		t.Errorf("got coal=%d, err=%v; want coal=0 and non-nil error", got, err)
+	if got != 0 || !errors.Is(err, ErrMinerNotFound) {
+		t.Errorf("got coal=%d, err=%v; want coal=0 and %v error", got, err, ErrMinerNotFound)
 	}
 }
 
