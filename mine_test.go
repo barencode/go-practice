@@ -103,7 +103,7 @@ func TestAddMinerInitializesMap(t *testing.T) {
 	mine.AddMiner(101, boris)
 	got := mine.Miners[101]
 	if len(mine.Miners) != 1 || got != boris {
-		t.Errorf("got team lenght=%d, miner=%p, want: 1 and %p", len(mine.Miners), got, boris)
+		t.Errorf("got team length=%d, miner=%p, want: 1 and %p", len(mine.Miners), got, boris)
 	}
 }
 
@@ -115,7 +115,7 @@ func TestAddMinerPreservesExisting(t *testing.T) {
 	mine.AddMiner(205, anna)
 	got := mine.Miners
 	if len(got) != 2 || got[101] != boris || got[205] != anna {
-		t.Errorf("got team lenght=%d, 1st miner=%p, 2nd miner=%p; want: 2 and %p and %p", len(got), got[101], got[205], boris, anna)
+		t.Errorf("got team length=%d, 1st miner=%p, 2nd miner=%p; want: 2 and %p and %p", len(got), got[101], got[205], boris, anna)
 	}
 }
 
@@ -127,6 +127,6 @@ func TestAddMinerReplacesExisting(t *testing.T) {
 	mine.AddMiner(101, anna)
 	got := mine.Miners
 	if len(got) != 1 || got[101] != anna {
-		t.Errorf("got team lenght=%d, miner=%p; want: 1 and %p", len(got), got[101], anna)
+		t.Errorf("got team length=%d, miner=%p; want: 1 and %p", len(got), got[101], anna)
 	}
 }
