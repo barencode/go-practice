@@ -161,7 +161,50 @@ func TestRemoveMinerNilValue(t *testing.T) {
 func TestRemoveMinerNotFound(t *testing.T) {
 	var mine Mine
 	err := mine.RemoveMiner(999)
+
 	if !errors.Is(err, ErrMinerNotFound) {
 		t.Errorf("got error=%v; want error=%v", err, ErrMinerNotFound)
+	}
+}
+
+func TestFindMinerExisting(t *testing.T) {
+	var mine Mine
+	boris := &Miner{"Борис", 2, 3}
+	mine.AddMiner(101, boris)
+	miner, err := mine.FindMiner(101)
+
+	if miner != boris || err != nil {
+		t.Errorf("got miner=%p error=%v; want miner=%p and nil", miner, err, boris)
+	}
+}
+
+func TestFindMinerNotFound(t *testing.T) {
+	var mine Mine
+	miner, err := mine.FindMiner(999)
+
+	if miner != nil || !errors.Is(err, ErrMinerNotFound) {
+		t.Errorf("got miner=%p error=%v; want miner=nil and error=%v", miner, err, ErrMinerNotFound)
+	}
+}
+
+func TestFindMinerNilValue(t *testing.T) {
+	var mine Mine
+	mine.AddMiner(101, nil)
+	miner, err := mine.FindMiner(101)
+
+	if miner != nil || !errors.Is(err, ErrMinerNotFound) {
+		t.Errorf("got miner=%p error=%v; want miner=nil and error=%v", miner, err, ErrMinerNotFound)
+	}
+}
+
+func TestFindMinerWhenClosed(t *testing.T) {
+	var mine Mine
+	mine.Closed = true
+	boris := &Miner{"Борис", 2, 3}
+	mine.AddMiner(101, boris)
+	miner, err := mine.FindMiner(101)
+
+	if miner != boris || err != nil {
+		t.Errorf("got miner=%p error=%v; want miner=%p and nil", miner, err, boris)
 	}
 }
