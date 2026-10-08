@@ -126,7 +126,42 @@ func TestAddMinerReplacesExisting(t *testing.T) {
 	mine.AddMiner(101, boris)
 	mine.AddMiner(101, anna)
 	got := mine.Miners
+
 	if len(got) != 1 || got[101] != anna {
 		t.Errorf("got team length=%d, miner=%p; want: 1 and %p", len(got), got[101], anna)
+	}
+}
+
+func TestRemoveMinerExisting(t *testing.T) {
+	var mine Mine
+	boris := &Miner{"Борис", 2, 3}
+	anna := &Miner{"Анна", 3, 2}
+	mine.AddMiner(101, boris)
+	mine.AddMiner(205, anna)
+	err := mine.RemoveMiner(101)
+	_, exists := mine.Miners[101]
+
+	if err != nil || len(mine.Miners) != 1 || mine.Miners[205] != anna || exists {
+		t.Errorf("got error=%v, team length=%d, miner=%p, deleted key exists=%t; want nil, 1, %p, false",
+			err, len(mine.Miners), mine.Miners[205], exists, anna)
+	}
+}
+
+func TestRemoveMinerNilValue(t *testing.T) {
+	var mine Mine
+	mine.AddMiner(101, nil)
+	err := mine.RemoveMiner(101)
+	_, exists := mine.Miners[101]
+
+	if err != nil || exists {
+		t.Errorf("got error=%v, deleted miner exists=%t; want nil, false", err, exists)
+	}
+}
+
+func TestRemoveMinerNotFound(t *testing.T) {
+	var mine Mine
+	err := mine.RemoveMiner(999)
+	if !errors.Is(err, ErrMinerNotFound) {
+		t.Errorf("got error=%v; want error=%v", err, ErrMinerNotFound)
 	}
 }

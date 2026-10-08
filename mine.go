@@ -24,3 +24,12 @@ func (mine *Mine) AddMiner(id int, miner *Miner) {
 	}
 	mine.Miners[id] = miner
 }
+
+func (mine *Mine) RemoveMiner(id int) error {
+	_, ok := mine.Miners[id]
+	if !ok {
+		return fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
+	}
+	delete(mine.Miners, id)
+	return nil
+}
