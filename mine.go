@@ -33,3 +33,11 @@ func (mine *Mine) RemoveMiner(id int) error {
 	delete(mine.Miners, id)
 	return nil
 }
+
+func (mine *Mine) FindMiner(id int) (*Miner, error) {
+	miner, ok := mine.Miners[id]
+	if !ok || miner == nil {
+		return nil, fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
+	}
+	return miner, nil
+}
