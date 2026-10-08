@@ -17,3 +17,10 @@ func (mine *Mine) MineByID(id int) (int, error) {
 	}
 	return miner.MineOnce(), nil
 }
+
+func (mine *Mine) AddMiner(id int, miner *Miner) {
+	if mine.Miners == nil {
+		mine.Miners = make(map[int]*Miner)
+	}
+	mine.Miners[id] = miner
+}

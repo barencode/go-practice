@@ -31,4 +31,10 @@ func main() {
 		return
 	}
 	fmt.Println("Coal mined:", coal)
+
+	var newMine Mine
+	newMine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	newMine.AddMiner(205, &Miner{Name: "Анна", Energy: 3, Production: 2})
+
+	fmt.Println(len(newMine.Miners))
 }
