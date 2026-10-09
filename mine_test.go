@@ -266,3 +266,32 @@ func TestSpendCoalInvalidAmount(t *testing.T) {
 		}
 	}
 }
+
+func TestRestMinerSuccess(t *testing.T) {
+	mine := Mine{Closed: true, Coal: 5}
+	mine.AddMiner(101, &Miner{"Борис", 0, 3})
+	err := mine.RestMiner(101)
+
+	if err != nil || mine.Coal != 3 || mine.Miners[101].Energy != 1 {
+		t.Errorf("after spending 2 coals got total coal=%d, 1st miner energy=%d and error=%v; want 3, 1 and nil", mine.Coal, mine.Miners[101].Energy, err)
+	}
+}
+
+func TestRestMinerNotEnoughCoal(t *testing.T) {
+	mine := Mine{Closed: true, Coal: 1}
+	mine.AddMiner(101, &Miner{"Борис", 0, 3})
+	err := mine.RestMiner(101)
+
+	if !errors.Is(err, ErrNotEnoughCoal) || mine.Coal != 1 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got total coal=%d, 1st miner energy=%d and error=%v; want 1, 0 and %v", mine.Coal, mine.Miners[101].Energy, err, ErrNotEnoughCoal)
+	}
+}
+
+func TestRestMinerNotFound(t *testing.T) {
+	mine := Mine{Closed: true, Coal: 5}
+	err := mine.RestMiner(999)
+
+	if !errors.Is(err, ErrMinerNotFound) || mine.Coal != 5 {
+		t.Errorf("got total coal=%d and error=%v, want 5 and %v", mine.Coal, err, ErrMinerNotFound)
+	}
+}

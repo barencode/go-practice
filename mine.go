@@ -55,3 +55,16 @@ func (mine *Mine) SpendCoal(amount int) error {
 	mine.Coal -= amount
 	return nil
 }
+
+func (mine *Mine) RestMiner(id int) error {
+	miner, err := mine.FindMiner(id)
+	if err != nil {
+		return err
+	}
+	err = mine.SpendCoal(2)
+	if err != nil {
+		return err
+	}
+	miner.Energy += 1
+	return nil
+}
