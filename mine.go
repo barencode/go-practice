@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Mine struct {
 	Miners map[int]*Miner
@@ -67,4 +70,13 @@ func (mine *Mine) RestMiner(id int) error {
 	}
 	miner.Energy += 1
 	return nil
+}
+
+func (mine *Mine) MinerIDs() []int {
+	ids := []int{}
+	for id := range mine.Miners {
+		ids = append(ids, id)
+	}
+	sort.Ints(ids)
+	return ids
 }
