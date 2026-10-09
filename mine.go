@@ -11,9 +11,9 @@ func (mine *Mine) MineByID(id int) (int, error) {
 	if mine.Closed {
 		return 0, fmt.Errorf("ошибка шахты: %w", ErrMineClosed)
 	}
-	miner, ok := mine.Miners[id]
-	if !ok || miner == nil {
-		return 0, fmt.Errorf("miner %d: %w", id, ErrMinerNotFound)
+	miner, err := mine.FindMiner(id)
+	if err != nil {
+		return 0, err
 	}
 	return miner.MineOnce(), nil
 }
