@@ -72,13 +72,14 @@ func TestMineByIDClosed(t *testing.T) {
 	testMine := Mine{
 		Miners: team,
 		Closed: true,
+		Coal:   10,
 	}
 	got, err := testMine.MineByID(101)
 	wantProduction := 0
 	wantEnergy := 2
 
-	if got != wantProduction || team[101].Energy != wantEnergy || !errors.Is(err, ErrMineClosed) {
-		t.Errorf("got production=%d, miner energy=%d and err=%v; want production=%d, miner energy=%d and error=%v", got, team[101].Energy, err, wantProduction, wantEnergy, ErrMineClosed)
+	if got != wantProduction || team[101].Energy != wantEnergy || !errors.Is(err, ErrMineClosed) || testMine.Coal != 10 {
+		t.Errorf("got production=%d, miner energy=%d, total coal=%d and err=%v; want production=%d, miner energy=%d, total coal=10 and error=%v", got, team[101].Energy, testMine.Coal, err, wantProduction, wantEnergy, ErrMineClosed)
 	}
 }
 
@@ -206,5 +207,23 @@ func TestFindMinerWhenClosed(t *testing.T) {
 
 	if miner != boris || err != nil {
 		t.Errorf("got miner=%p error=%v; want miner=%p and nil", miner, err, boris)
+	}
+}
+
+func TestMineByIDAccumulatesCoal(t *testing.T) {
+	mine := Mine{Coal: 10}
+	mine.AddMiner(101, &Miner{"Борис", 2, 3})
+
+	shiftProduction, err := mine.MineByID(101)
+	if shiftProduction != 3 || mine.Coal != 13 || err != nil {
+		t.Errorf("after 1st shift: got production=%d, total coal=%d, err=%v; want 3, 13, nil", shiftProduction, mine.Coal, err)
+	}
+	shiftProduction, err = mine.MineByID(101)
+	if shiftProduction != 3 || mine.Coal != 16 || err != nil {
+		t.Errorf("after 2nd shift: got production=%d, total coal=%d, err=%v; want 3, 16, nil", shiftProduction, mine.Coal, err)
+	}
+	shiftProduction, err = mine.MineByID(101)
+	if shiftProduction != 0 || mine.Coal != 16 || err != nil {
+		t.Errorf("after 3rd shift: got production=%d, total coal=%d, err=%v; want 0, 16, nil", shiftProduction, mine.Coal, err)
 	}
 }
