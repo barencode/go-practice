@@ -5,6 +5,7 @@ import "fmt"
 type Mine struct {
 	Miners map[int]*Miner
 	Closed bool
+	Coal   int
 }
 
 func (mine *Mine) MineByID(id int) (int, error) {
@@ -15,7 +16,9 @@ func (mine *Mine) MineByID(id int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	return miner.MineOnce(), nil
+	mining := miner.MineOnce()
+	mine.Coal += mining
+	return mining, nil
 }
 
 func (mine *Mine) AddMiner(id int, miner *Miner) {
