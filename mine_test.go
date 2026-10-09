@@ -313,3 +313,25 @@ func TestMineRestAndMineAgain(t *testing.T) {
 		t.Errorf("got 2nd mining performance=%d, total coal=%d, 1st miner energy=%d and error=%v; want 3, 4, 0 and nil", coal, mine.Coal, mine.Miners[101].Energy, err)
 	}
 }
+
+func TestMinerIDs(t *testing.T) {
+	mine := Mine{}
+	mine.AddMiner(205, nil)
+	mine.AddMiner(101, &Miner{"Борис", 3, 2})
+	got := mine.MinerIDs()
+	if len(got) != 2 {
+		t.Fatalf("got %d members; want 2", len(got))
+	}
+	if got[0] != 101 || got[1] != 205 {
+		t.Errorf("got IDs: 1st=%d and 2nd=%d; want 101 and 205", got[0], got[1])
+	}
+}
+
+func TestMinerIDsEmpty(t *testing.T) {
+	var mine Mine
+	got := mine.MinerIDs()
+
+	if len(got) != 0 {
+		t.Errorf("got %d IDs; want 0", len(got))
+	}
+}
