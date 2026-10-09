@@ -295,3 +295,21 @@ func TestRestMinerNotFound(t *testing.T) {
 		t.Errorf("got total coal=%d and error=%v, want 5 and %v", mine.Coal, err, ErrMinerNotFound)
 	}
 }
+
+func TestMineRestAndMineAgain(t *testing.T) {
+	mine := Mine{Closed: false, Coal: 0} // for MineByID mine MUST be !Closed
+	mine.AddMiner(101, &Miner{"Борис", 1, 3})
+	coal, err := mine.MineByID(101) // perf 3, coal 3, energy 0
+
+	if err != nil || coal != 3 || mine.Coal != 3 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got 1st mining performance=%d, total coal=%d, 1st miner energy=%d and error=%v; want 3, 3, 0 and nil", coal, mine.Coal, mine.Miners[101].Energy, err)
+	}
+	err = mine.RestMiner(101) // perf 3, coal 1, energy 1
+	if err != nil || mine.Coal != 1 || mine.Miners[101].Energy != 1 {
+		t.Errorf("got rest total coal=%d, 1st miner energy=%d and error=%v; want 1, 1 and nil", mine.Coal, mine.Miners[101].Energy, err)
+	}
+	coal, err = mine.MineByID(101) // perf 3, coal 4, energy 0
+	if err != nil || coal != 3 || mine.Coal != 4 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got 2nd mining performance=%d, total coal=%d, 1st miner energy=%d and error=%v; want 3, 4, 0 and nil", coal, mine.Coal, mine.Miners[101].Energy, err)
+	}
+}
