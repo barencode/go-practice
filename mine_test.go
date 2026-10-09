@@ -227,3 +227,42 @@ func TestMineByIDAccumulatesCoal(t *testing.T) {
 		t.Errorf("after 3rd shift: got production=%d, total coal=%d, err=%v; want 0, 16, nil", shiftProduction, mine.Coal, err)
 	}
 }
+
+func TestSpendCoalSuccess(t *testing.T) {
+	// Closed mine shouldn't interrupt coal spending
+	mine := Mine{Closed: true, Coal: 10}
+
+	err := mine.SpendCoal(4)
+	if err != nil || mine.Coal != 6 {
+		t.Errorf("got total coal=%d, err=%v; want coal=6, err=nil", mine.Coal, err)
+	}
+}
+
+func TestSpendCoalExactAmount(t *testing.T) {
+	mine := Mine{Closed: true, Coal: 10}
+
+	err := mine.SpendCoal(10)
+	if err != nil || mine.Coal != 0 {
+		t.Errorf("got total coal=%d, err=%v; want coal=0, err=nil", mine.Coal, err)
+	}
+}
+
+func TestSpendCoalNotEnough(t *testing.T) {
+	mine := Mine{Closed: true, Coal: 10}
+
+	err := mine.SpendCoal(11)
+	if !errors.Is(err, ErrNotEnoughCoal) || mine.Coal != 10 {
+		t.Errorf("got total coal=%d, err=%v; want coal=10, err=%v", mine.Coal, err, ErrNotEnoughCoal)
+	}
+}
+
+func TestSpendCoalInvalidAmount(t *testing.T) {
+	for _, amount := range []int{0, -3} {
+		mine := Mine{Coal: 10}
+		err := mine.SpendCoal(amount)
+
+		if !errors.Is(err, ErrInvalidAmount) || mine.Coal != 10 {
+			t.Errorf("after amount %d got total coal=%d, err=%v; want coal=10, err=%v", amount, mine.Coal, err, ErrInvalidAmount)
+		}
+	}
+}
