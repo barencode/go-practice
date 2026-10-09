@@ -44,3 +44,14 @@ func (mine *Mine) FindMiner(id int) (*Miner, error) {
 	}
 	return miner, nil
 }
+
+func (mine *Mine) SpendCoal(amount int) error {
+	if amount <= 0 {
+		return fmt.Errorf("amount %d: %w", amount, ErrInvalidAmount)
+	}
+	if amount > mine.Coal {
+		return fmt.Errorf("insufficient coal: %d, requested %d: %w", mine.Coal, amount, ErrNotEnoughCoal)
+	}
+	mine.Coal -= amount
+	return nil
+}
