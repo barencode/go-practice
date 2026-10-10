@@ -22,12 +22,10 @@ func main() {
 		Reserves: 10,
 	}
 
-	printMineSummary(&mine)
-
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Print("Введите ID шахтёра (0 - выход): ")
+		fmt.Print("Введите команду (mine, status, rest, exit): ")
 		if !scanner.Scan() {
 			if err := scanner.Err(); err != nil {
 				fmt.Println("Ошибка чтения:", err)
@@ -35,32 +33,73 @@ func main() {
 			return
 		}
 
-		input := scanner.Text()
+		command := strings.TrimSpace(scanner.Text())
 
-		id, err := strconv.Atoi(strings.TrimSpace(input))
-		if err != nil {
-			fmt.Println("Некорректный ID")
-			continue
-		}
-		if id == 0 {
+		switch command {
+		case "status":
+			printMineSummary(&mine)
+		case "exit":
 			return
-		}
-
-		fmt.Println("Ищем шахтёра с ID:", id)
-		coal, err := mine.MineByID(id)
-		if err != nil {
-			if errors.Is(err, ErrMineClosed) {
-				fmt.Println("Добыча остановлена")
+		case "mine":
+			fmt.Print("Введите ID шахтёра: ")
+			if !scanner.Scan() {
+				if err := scanner.Err(); err != nil {
+					fmt.Println("Ошибка чтения:", err)
+				}
 				return
 			}
-			if errors.Is(err, ErrMinerNotFound) {
-				fmt.Println("Выберите другого шахтёра")
+			id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+			if err != nil {
+				fmt.Println("Некорректный ID")
 				continue
 			}
-			fmt.Println("Operation caused an error:", err)
-			return
+			fmt.Println("Ищем шахтёра с ID:", id)
+			coal, err := mine.MineByID(id)
+			if err != nil {
+				if errors.Is(err, ErrMineClosed) {
+					fmt.Println("Добыча остановлена")
+					continue
+				}
+				if errors.Is(err, ErrMinerNotFound) {
+					fmt.Println("Выберите другого шахтёра")
+					continue
+				}
+				fmt.Println("Operation caused an error:", err)
+				continue
+			}
+			fmt.Println("Coal mined:", coal)
+			printMineSummary(&mine)
+		case "rest":
+			fmt.Print("Введите ID шахтёра: ")
+			if !scanner.Scan() {
+				if err := scanner.Err(); err != nil {
+					fmt.Println("Ошибка чтения:", err)
+				}
+				return
+			}
+			id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+			if err != nil {
+				fmt.Println("Некорректный ID")
+				continue
+			}
+			fmt.Println("Ищем шахтёра с ID:", id)
+			err = mine.RestMiner(id)
+			if err != nil {
+				if errors.Is(err, ErrMinerNotFound) {
+					fmt.Println("Выберите другого шахтёра")
+					continue
+				}
+				if errors.Is(err, ErrNotEnoughCoal) {
+					fmt.Println("Недостаточно угля")
+					continue
+				}
+				fmt.Println("Operation caused an error:", err)
+				continue
+			}
+			fmt.Println("Шахтёр с ID:", id, "отдохнул")
+			printMineSummary(&mine)
+		default:
+			fmt.Println("Неизвестная команда")
 		}
-		fmt.Println("Coal mined:", coal)
-		printMineSummary(&mine)
 	}
 }
