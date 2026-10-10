@@ -6,9 +6,10 @@ import (
 )
 
 type Mine struct {
-	Miners map[int]*Miner
-	Closed bool
-	Coal   int
+	Miners   map[int]*Miner
+	Closed   bool
+	Coal     int
+	Reserves int
 }
 
 func (mine *Mine) MineByID(id int) (int, error) {
@@ -19,8 +20,15 @@ func (mine *Mine) MineByID(id int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	if mine.Reserves <= 0 {
+		return 0, nil
+	}
 	mining := miner.MineOnce()
+	if mining > mine.Reserves {
+		mining = mine.Reserves
+	}
 	mine.Coal += mining
+	mine.Reserves -= mining
 	return mining, nil
 }
 

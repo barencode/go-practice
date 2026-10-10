@@ -13,8 +13,9 @@ func main() {
 	}
 
 	mine := Mine{
-		Miners: team,
-		Closed: false,
+		Miners:   team,
+		Closed:   false,
+		Reserves: 10,
 	}
 
 	coal, err := mine.MineByID(101)

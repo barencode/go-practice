@@ -38,8 +38,9 @@ func TestMineByIDExhausted(t *testing.T) {
 		101: {Name: "Борис", Energy: 0, Production: 3},
 	}
 	testMine := Mine{
-		Miners: team,
-		Closed: false,
+		Miners:   team,
+		Closed:   false,
+		Reserves: 3,
 	}
 	got, err := testMine.MineByID(101)
 
@@ -53,8 +54,9 @@ func TestMineByIDWithEnergy(t *testing.T) {
 		101: {Name: "", Energy: 2, Production: 3},
 	}
 	testMine := Mine{
-		Miners: team,
-		Closed: false,
+		Miners:   team,
+		Closed:   false,
+		Reserves: 3,
 	}
 	got, err := testMine.MineByID(101)
 	wantProduction := 3 // equals to production and 1 cycle of mining
@@ -211,7 +213,7 @@ func TestFindMinerWhenClosed(t *testing.T) {
 }
 
 func TestMineByIDAccumulatesCoal(t *testing.T) {
-	mine := Mine{Coal: 10}
+	mine := Mine{Coal: 10, Reserves: 9}
 	mine.AddMiner(101, &Miner{"Борис", 2, 3})
 
 	shiftProduction, err := mine.MineByID(101)
@@ -297,7 +299,7 @@ func TestRestMinerNotFound(t *testing.T) {
 }
 
 func TestMineRestAndMineAgain(t *testing.T) {
-	mine := Mine{Closed: false, Coal: 0} // for MineByID mine MUST be !Closed
+	mine := Mine{Closed: false, Coal: 0, Reserves: 6} // for MineByID mine MUST be !Closed
 	mine.AddMiner(101, &Miner{"Борис", 1, 3})
 	coal, err := mine.MineByID(101) // perf 3, coal 3, energy 0
 
@@ -333,5 +335,21 @@ func TestMinerIDsEmpty(t *testing.T) {
 
 	if len(got) != 0 {
 		t.Errorf("got %d IDs; want 0", len(got))
+	}
+}
+
+func TestMineByIDPartialReserves(t *testing.T) {
+	mine := Mine{Coal: 10, Reserves: 2}
+	mine.AddMiner(101, &Miner{"Борис", 2, 3})
+	got, err := mine.MineByID(101)
+
+	if got != 2 || mine.Coal != 12 || mine.Reserves != 0 || mine.Miners[101].Energy != 1 || err != nil {
+		t.Errorf("after 1st mining got round coal=%d, total coal=%d, mine reserves=%d, 1st miner energy=%d and err=%v; want %d, %d, %d, %d and %v", got, mine.Coal, mine.Reserves, mine.Miners[101].Energy, err, 2, 12, 0, 1, nil)
+	}
+
+	got, err = mine.MineByID(101)
+
+	if got != 0 || mine.Coal != 12 || mine.Reserves != 0 || mine.Miners[101].Energy != 1 || err != nil {
+		t.Errorf("after 2nd mining got round coal=%d, total coal=%d, mine reserves=%d, 1st miner energy=%d and err=%v; want %d, %d, %d, %d and %v", got, mine.Coal, mine.Reserves, mine.Miners[101].Energy, err, 0, 12, 0, 1, nil)
 	}
 }
