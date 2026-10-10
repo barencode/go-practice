@@ -20,27 +20,34 @@ func main() {
 
 	printMineSummary(&mine)
 
-	var id int
-	fmt.Print("Введите ID шахтёра: ")
-	_, err := fmt.Scan(&id)
-	if err != nil {
-		fmt.Println("Некорректный ID")
-		return
-	}
-	fmt.Println("Ищем шахтёра с ID:", id)
-	coal, err := mine.MineByID(id)
-	if err != nil {
-		if errors.Is(err, ErrMineClosed) {
-			fmt.Println("Добыча остановлена")
+	for {
+		var id int
+		fmt.Print("Введите ID шахтёра (0 - выход): ")
+		_, err := fmt.Scan(&id)
+
+		if err != nil {
+			fmt.Println("Некорректный ID")
 			return
 		}
-		if errors.Is(err, ErrMinerNotFound) {
-			fmt.Println("Выберите другого шахтёра")
+		if id == 0 {
 			return
 		}
-		fmt.Println("Operation caused an error:", err)
-		return
+
+		fmt.Println("Ищем шахтёра с ID:", id)
+		coal, err := mine.MineByID(id)
+		if err != nil {
+			if errors.Is(err, ErrMineClosed) {
+				fmt.Println("Добыча остановлена")
+				return
+			}
+			if errors.Is(err, ErrMinerNotFound) {
+				fmt.Println("Выберите другого шахтёра")
+				continue
+			}
+			fmt.Println("Operation caused an error:", err)
+			return
+		}
+		fmt.Println("Coal mined:", coal)
+		printMineSummary(&mine)
 	}
-	fmt.Println("Coal mined:", coal)
-	printMineSummary(&mine)
 }
