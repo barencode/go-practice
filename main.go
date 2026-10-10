@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -48,7 +47,7 @@ func main() {
 				}
 				return
 			}
-			id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+			id, err := parseMinerID(scanner.Text())
 			if err != nil {
 				fmt.Println("Некорректный ID")
 				continue
@@ -77,7 +76,7 @@ func main() {
 				}
 				return
 			}
-			id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+			id, err := parseMinerID(scanner.Text())
 			if err != nil {
 				fmt.Println("Некорректный ID")
 				continue

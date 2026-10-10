@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 func printMineSummary(mine *Mine) {
 	fmt.Printf("На складе: %d, в залежах: %d\n", mine.Coal, mine.Reserves)
@@ -14,4 +18,8 @@ func printMineSummary(mine *Mine) {
 		}
 		fmt.Printf("%d: %s: энергия %d, добыча за смену %d\n", id, miner.Name, miner.Energy, miner.Production)
 	}
+}
+
+func parseMinerID(input string) (int, error) {
+	return strconv.Atoi(strings.TrimSpace(input))
 }
