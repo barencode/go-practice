@@ -18,7 +18,17 @@ func main() {
 		Reserves: 10,
 	}
 
-	coal, err := mine.MineByID(101)
+	printMineSummary(&mine)
+
+	var id int
+	fmt.Print("Введите ID шахтёра: ")
+	_, err := fmt.Scan(&id)
+	if err != nil {
+		fmt.Println("Некорректный ID")
+		return
+	}
+	fmt.Println("Ищем шахтёра с ID:", id)
+	coal, err := mine.MineByID(id)
 	if err != nil {
 		if errors.Is(err, ErrMineClosed) {
 			fmt.Println("Добыча остановлена")
@@ -32,6 +42,5 @@ func main() {
 		return
 	}
 	fmt.Println("Coal mined:", coal)
-
 	printMineSummary(&mine)
 }
