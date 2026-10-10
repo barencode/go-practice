@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -20,14 +24,23 @@ func main() {
 
 	printMineSummary(&mine)
 
-	for {
-		var id int
-		fmt.Print("Введите ID шахтёра (0 - выход): ")
-		_, err := fmt.Scan(&id)
+	scanner := bufio.NewScanner(os.Stdin)
 
+	for {
+		fmt.Print("Введите ID шахтёра (0 - выход): ")
+		if !scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				fmt.Println("Ошибка чтения:", err)
+			}
+			return
+		}
+
+		input := scanner.Text()
+
+		id, err := strconv.Atoi(strings.TrimSpace(input))
 		if err != nil {
 			fmt.Println("Некорректный ID")
-			return
+			continue
 		}
 		if id == 0 {
 			return
