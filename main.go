@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -25,14 +26,16 @@ func main() {
 
 	for {
 		fmt.Print("Введите команду (mine, status, rest, exit): ")
-		if !scanner.Scan() {
-			if err := scanner.Err(); err != nil {
-				fmt.Println("Ошибка чтения:", err)
-			}
+		input, err := readLine(scanner)
+		if errors.Is(err, io.EOF) {
+			return
+		}
+		if err != nil {
+			fmt.Println("Ошибка чтения:", err)
 			return
 		}
 
-		command := strings.TrimSpace(scanner.Text())
+		command := strings.TrimSpace(input)
 
 		switch command {
 		case "status":
@@ -41,13 +44,15 @@ func main() {
 			return
 		case "mine":
 			fmt.Print("Введите ID шахтёра: ")
-			if !scanner.Scan() {
-				if err := scanner.Err(); err != nil {
-					fmt.Println("Ошибка чтения:", err)
-				}
+			input, err := readLine(scanner)
+			if errors.Is(err, io.EOF) {
 				return
 			}
-			id, err := parseMinerID(scanner.Text())
+			if err != nil {
+				fmt.Println("Ошибка чтения:", err)
+				return
+			}
+			id, err := parseMinerID(input)
 			if err != nil {
 				fmt.Println("Некорректный ID")
 				continue
@@ -70,13 +75,15 @@ func main() {
 			printMineSummary(&mine)
 		case "rest":
 			fmt.Print("Введите ID шахтёра: ")
-			if !scanner.Scan() {
-				if err := scanner.Err(); err != nil {
-					fmt.Println("Ошибка чтения:", err)
-				}
+			input, err := readLine(scanner)
+			if errors.Is(err, io.EOF) {
 				return
 			}
-			id, err := parseMinerID(scanner.Text())
+			if err != nil {
+				fmt.Println("Ошибка чтения:", err)
+				return
+			}
+			id, err := parseMinerID(input)
 			if err != nil {
 				fmt.Println("Некорректный ID")
 				continue

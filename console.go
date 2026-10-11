@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 )
@@ -22,4 +24,14 @@ func printMineSummary(mine *Mine) {
 
 func parseMinerID(input string) (int, error) {
 	return strconv.Atoi(strings.TrimSpace(input))
+}
+
+func readLine(scanner *bufio.Scanner) (string, error) {
+	if !scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return "", err
+		}
+		return "", io.EOF
+	}
+	return scanner.Text(), nil
 }

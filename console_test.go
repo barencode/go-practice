@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"errors"
+	"io"
+	"strings"
 	"testing"
 )
 
@@ -30,5 +34,28 @@ func TestParseMinerIDZero(t *testing.T) {
 
 	if got != 0 || err != nil {
 		t.Errorf("got %d and err=%v; want 0 and nil", got, err)
+	}
+}
+
+func TestReadLine(t *testing.T) {
+	scanner := bufio.NewScanner(strings.NewReader("Борис\n"))
+
+	got, err := readLine(scanner)
+	if got != "Борис" || err != nil {
+		t.Errorf("got text=%q, err=%v, want text=%q, err=nil", got, err, "Борис")
+	}
+
+	got, err = readLine(scanner)
+	if got != "" || !errors.Is(err, io.EOF) {
+		t.Errorf("got text=%q, err=%v, want text=%q, err=EOF", got, err, "")
+	}
+}
+
+func TestReadLineEmpty(t *testing.T) {
+	scanner := bufio.NewScanner(strings.NewReader("\n"))
+
+	got, err := readLine(scanner)
+	if got != "" || err != nil {
+		t.Errorf("got text=%q, err=%v, want text=%q, err=nil", got, err, "")
 	}
 }
