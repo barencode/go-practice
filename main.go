@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -34,36 +33,23 @@ func main() {
 			fmt.Println("Ошибка чтения:", err)
 			return
 		}
-		parts := strings.Fields(input)
-		if len(parts) == 0 {
+
+		command, err := parseCommand(input)
+		if errors.Is(err, ErrEmptyCommand) {
+			continue
+		}
+		if err != nil {
+			fmt.Println("Ошибка команды:", err)
 			continue
 		}
 
-		switch parts[0] {
+		switch command.Name {
 		case "status":
-			if len(parts) != 1 {
-				fmt.Println("Формат: status")
-				continue
-			}
 			printMineSummary(&mine)
 		case "exit":
-			if len(parts) != 1 {
-				fmt.Println("Формат: exit")
-				continue
-			}
 			return
 		case "mine":
-			if len(parts) != 2 {
-				fmt.Println("Формат: mine <ID>")
-				continue
-			}
-
-			id, err := parseMinerID(parts[1])
-			if err != nil {
-				fmt.Println("Некорректный ID")
-				continue
-			}
-
+			id := command.MinerID
 			fmt.Println("Ищем шахтёра с ID:", id)
 			coal, err := mine.MineByID(id)
 			if err != nil {
@@ -81,15 +67,7 @@ func main() {
 			fmt.Println("Coal mined:", coal)
 			printMineSummary(&mine)
 		case "rest":
-			if len(parts) != 2 {
-				fmt.Println("Формат: rest <ID>")
-				continue
-			}
-			id, err := parseMinerID(parts[1])
-			if err != nil {
-				fmt.Println("Некорректный ID")
-				continue
-			}
+			id := command.MinerID
 			fmt.Println("Ищем шахтёра с ID:", id)
 			err = mine.RestMiner(id)
 			if err != nil {
