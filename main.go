@@ -41,8 +41,16 @@ func main() {
 
 		switch parts[0] {
 		case "status":
+			if len(parts) != 1 {
+				fmt.Println("Формат: status")
+				continue
+			}
 			printMineSummary(&mine)
 		case "exit":
+			if len(parts) != 1 {
+				fmt.Println("Формат: exit")
+				continue
+			}
 			return
 		case "mine":
 			if len(parts) != 2 {
