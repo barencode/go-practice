@@ -14,7 +14,7 @@ type Command struct {
 }
 
 func printMineSummary(mine *Mine) {
-	fmt.Printf("На складе: %d, в залежах: %d\n", mine.Coal, mine.Reserves)
+	fmt.Printf("На складе: %d, в залежах: %d, шахта закрыта: %t\n", mine.Coal, mine.Reserves, mine.Closed)
 
 	ids := mine.MinerIDs()
 	for _, id := range ids {
