@@ -85,7 +85,7 @@ func TestParseCommandEmpty(t *testing.T) {
 }
 
 func TestParseCommandInvalid(t *testing.T) {
-	inputs := []string{"hello", "mine", "rest", "mine 101 extra", "status 101", "exit extra"}
+	inputs := []string{"hello", "mine", "rest", "mine 101 extra", "status 101", "exit extra", "open 101", "close 101"}
 	for _, input := range inputs {
 		got, err := parseCommand(input)
 		if !errors.Is(err, ErrInvalidCommand) || got.Name != "" || got.MinerID != 0 {
@@ -112,5 +112,15 @@ func TestParseCommandExit(t *testing.T) {
 	got, err := parseCommand("exit")
 	if got.Name != "exit" || got.MinerID != 0 || err != nil {
 		t.Errorf("got command=%+v, command=%s, minerID=%d, err=%v; want command=\"exit\", ID=0 and nil error", got, got.Name, got.MinerID, err)
+	}
+}
+
+func TestParseCommandOpenClose(t *testing.T) {
+	inputs := []string{"open", "close"}
+	for _, input := range inputs {
+		got, err := parseCommand(input)
+		if got.Name != input || got.MinerID != 0 || err != nil {
+			t.Errorf("input=%q: got command=%+v, err=%v; want Name=%q, MinerID=0, err=nil", input, got, err, input)
+		}
 	}
 }
