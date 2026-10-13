@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -70,52 +69,52 @@ func parseCommand(input string) (Command, error) {
 	}
 }
 
-func executeCommand(mine *Mine, command Command) bool {
+func executeCommand(out io.Writer, mine *Mine, command Command) bool {
 	switch command.Name {
 	case "mine":
 		id := command.MinerID
-		fmt.Println("Ищем шахтёра с ID:", id)
+		fmt.Fprintf(out, "Ищем шахтёра с ID: %d\n", id)
 		coal, err := mine.MineByID(id)
 		if err != nil {
 			if errors.Is(err, ErrMineClosed) {
-				fmt.Println("Добыча остановлена")
+				fmt.Fprintf(out, "Добыча остановлена\n")
 				return false
 			}
 			if errors.Is(err, ErrMinerNotFound) {
-				fmt.Println("Выберите другого шахтёра")
+				fmt.Fprintf(out, "Выберите другого шахтёра\n")
 				return false
 			}
-			fmt.Println("Operation caused an error:", err)
+			fmt.Fprintf(out, "Operation caused an error: %v\n", err)
 			return false
 		}
-		fmt.Println("Coal mined:", coal)
-		printMineSummary(os.Stdout, mine)
+		fmt.Fprintf(out, "Coal mined: %d\n", coal)
+		printMineSummary(out, mine)
 	case "rest":
 		id := command.MinerID
-		fmt.Println("Ищем шахтёра с ID:", id)
+		fmt.Fprintf(out, "Ищем шахтёра с ID: %d\n", id)
 		err := mine.RestMiner(id)
 		if err != nil {
 			if errors.Is(err, ErrMinerNotFound) {
-				fmt.Println("Выберите другого шахтёра")
+				fmt.Fprintf(out, "Выберите другого шахтёра\n")
 				return false
 			}
 			if errors.Is(err, ErrNotEnoughCoal) {
-				fmt.Println("Недостаточно угля")
+				fmt.Fprintf(out, "Недостаточно угля\n")
 				return false
 			}
-			fmt.Println("Operation caused an error:", err)
+			fmt.Fprintf(out, "Operation caused an error: %v\n", err)
 			return false
 		}
-		fmt.Println("Шахтёр с ID:", id, "отдохнул")
-		printMineSummary(os.Stdout, mine)
+		fmt.Fprintf(out, "Шахтёр с ID: %d отдохнул\n", id)
+		printMineSummary(out, mine)
 	case "status":
-		printMineSummary(os.Stdout, mine)
+		printMineSummary(out, mine)
 	case "open":
 		mine.Closed = false
-		fmt.Println("Шахта открыта")
+		fmt.Fprintf(out, "Шахта открыта\n")
 	case "close":
 		mine.Closed = true
-		fmt.Println("Шахта закрыта")
+		fmt.Fprintf(out, "Шахта закрыта\n")
 	case "exit":
 		return true
 	}

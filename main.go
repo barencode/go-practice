@@ -43,7 +43,7 @@ func main() {
 			continue
 		}
 
-		if executeCommand(&mine, command) {
+		if executeCommand(os.Stdout, &mine, command) {
 			return
 		}
 	}
