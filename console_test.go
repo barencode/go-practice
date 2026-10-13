@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"io"
 	"strings"
@@ -173,5 +174,17 @@ func TestExecuteCommandMineClosed(t *testing.T) {
 	shouldExit := executeCommand(&mine, Command{Name: "mine", MinerID: 101})
 	if shouldExit || mine.Coal != 4 || mine.Reserves != 5 || mine.Miners[101].Energy != 1 {
 		t.Errorf("got should exit=%t, reserves=%d, coal=%d, and 1st miner energy=%d; want should exit=false, reserves=5, coal=4 and energy=1", shouldExit, mine.Reserves, mine.Coal, mine.Miners[101].Energy)
+	}
+}
+
+func TestPrintMineSummaryEmpty(t *testing.T) {
+	mine := Mine{Coal: 4, Reserves: 5, Closed: true}
+	var out bytes.Buffer
+
+	printMineSummary(&out, &mine)
+	got := out.String()
+	want := "На складе: 4, в залежах: 5, шахта закрыта: true\n"
+	if got != want {
+		t.Errorf("got %q, want %q", got, want)
 	}
 }
