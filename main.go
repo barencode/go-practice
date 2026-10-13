@@ -24,7 +24,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		fmt.Print("Введите команду (mine <ID>, rest <ID>, status, exit): ")
+		fmt.Print("Введите команду (mine <ID>, rest <ID>, status, exit, open, close): ")
 		input, err := readLine(scanner)
 		if errors.Is(err, io.EOF) {
 			return
@@ -84,6 +84,12 @@ func main() {
 			}
 			fmt.Println("Шахтёр с ID:", id, "отдохнул")
 			printMineSummary(&mine)
+		case "close":
+			mine.Closed = true
+			fmt.Println("Шахта закрыта")
+		case "open":
+			mine.Closed = false
+			fmt.Println("Шахта открыта")
 		default:
 			fmt.Println("Неизвестная команда")
 		}

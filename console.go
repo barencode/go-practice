@@ -49,7 +49,7 @@ func parseCommand(input string) (Command, error) {
 	}
 
 	switch parts[0] {
-	case "status", "exit":
+	case "status", "exit", "close", "open":
 		if len(parts) != 1 {
 			return Command{}, ErrInvalidCommand
 		}
