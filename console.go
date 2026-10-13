@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -14,17 +15,17 @@ type Command struct {
 	MinerID int
 }
 
-func printMineSummary(mine *Mine) {
-	fmt.Printf("На складе: %d, в залежах: %d, шахта закрыта: %t\n", mine.Coal, mine.Reserves, mine.Closed)
+func printMineSummary(out io.Writer, mine *Mine) {
+	fmt.Fprintf(out, "На складе: %d, в залежах: %d, шахта закрыта: %t\n", mine.Coal, mine.Reserves, mine.Closed)
 
 	ids := mine.MinerIDs()
 	for _, id := range ids {
 		miner, err := mine.FindMiner(id)
 		if err != nil {
-			fmt.Printf("%d: %v\n", id, err)
+			fmt.Fprintf(out, "%d: %v\n", id, err)
 			continue
 		}
-		fmt.Printf("%d: %s: энергия %d, добыча за смену %d\n", id, miner.Name, miner.Energy, miner.Production)
+		fmt.Fprintf(out, "%d: %s: энергия %d, добыча за смену %d\n", id, miner.Name, miner.Energy, miner.Production)
 	}
 }
 
@@ -88,7 +89,7 @@ func executeCommand(mine *Mine, command Command) bool {
 			return false
 		}
 		fmt.Println("Coal mined:", coal)
-		printMineSummary(mine)
+		printMineSummary(os.Stdout, mine)
 	case "rest":
 		id := command.MinerID
 		fmt.Println("Ищем шахтёра с ID:", id)
@@ -106,9 +107,9 @@ func executeCommand(mine *Mine, command Command) bool {
 			return false
 		}
 		fmt.Println("Шахтёр с ID:", id, "отдохнул")
-		printMineSummary(mine)
+		printMineSummary(os.Stdout, mine)
 	case "status":
-		printMineSummary(mine)
+		printMineSummary(os.Stdout, mine)
 	case "open":
 		mine.Closed = false
 		fmt.Println("Шахта открыта")
