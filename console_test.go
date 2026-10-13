@@ -124,3 +124,27 @@ func TestParseCommandOpenClose(t *testing.T) {
 		}
 	}
 }
+
+func TestExecuteCommandClose(t *testing.T) {
+	mine := Mine{Closed: false}
+	shouldExit := executeCommand(&mine, Command{Name: "close"})
+	if !mine.Closed || shouldExit {
+		t.Errorf("got closed=%t, should exit=%t, want: closed=true and should exit=false", mine.Closed, shouldExit)
+	}
+}
+
+func TestExecuteCommandOpen(t *testing.T) {
+	mine := Mine{Closed: true}
+	shouldExit := executeCommand(&mine, Command{Name: "open"})
+	if mine.Closed || shouldExit {
+		t.Errorf("got closed=%t, should exit=%t, want: closed=false and should exit=false", mine.Closed, shouldExit)
+	}
+}
+
+func TestExecuteCommandExit(t *testing.T) {
+	mine := Mine{}
+	shouldExit := executeCommand(&mine, Command{Name: "exit"})
+	if !shouldExit {
+		t.Errorf("got should exit=%t, want: should exit=true", shouldExit)
+	}
+}
