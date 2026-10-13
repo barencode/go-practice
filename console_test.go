@@ -188,3 +188,19 @@ func TestPrintMineSummaryEmpty(t *testing.T) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }
+
+func TestPrintMineSummaryWithMiners(t *testing.T) {
+	mine := Mine{}
+	mine.AddMiner(205, nil)
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	var out bytes.Buffer
+
+	printMineSummary(&out, &mine)
+	got := out.String()
+	want := "На складе: 0, в залежах: 0, шахта закрыта: false\n" +
+		"101: Борис: энергия 2, добыча за смену 3\n" +
+		"205: miner 205: шахтёр не найден\n"
+	if got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
