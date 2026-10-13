@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -66,4 +67,56 @@ func parseCommand(input string) (Command, error) {
 	default:
 		return Command{}, ErrInvalidCommand
 	}
+}
+
+func executeCommand(mine *Mine, command Command) bool {
+	switch command.Name {
+	case "mine":
+		id := command.MinerID
+		fmt.Println("Ищем шахтёра с ID:", id)
+		coal, err := mine.MineByID(id)
+		if err != nil {
+			if errors.Is(err, ErrMineClosed) {
+				fmt.Println("Добыча остановлена")
+				return false
+			}
+			if errors.Is(err, ErrMinerNotFound) {
+				fmt.Println("Выберите другого шахтёра")
+				return false
+			}
+			fmt.Println("Operation caused an error:", err)
+			return false
+		}
+		fmt.Println("Coal mined:", coal)
+		printMineSummary(mine)
+	case "rest":
+		id := command.MinerID
+		fmt.Println("Ищем шахтёра с ID:", id)
+		err := mine.RestMiner(id)
+		if err != nil {
+			if errors.Is(err, ErrMinerNotFound) {
+				fmt.Println("Выберите другого шахтёра")
+				return false
+			}
+			if errors.Is(err, ErrNotEnoughCoal) {
+				fmt.Println("Недостаточно угля")
+				return false
+			}
+			fmt.Println("Operation caused an error:", err)
+			return false
+		}
+		fmt.Println("Шахтёр с ID:", id, "отдохнул")
+		printMineSummary(mine)
+	case "status":
+		printMineSummary(mine)
+	case "open":
+		mine.Closed = false
+		fmt.Println("Шахта открыта")
+	case "close":
+		mine.Closed = true
+		fmt.Println("Шахта закрыта")
+	case "exit":
+		return true
+	}
+	return false
 }
