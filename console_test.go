@@ -148,3 +148,21 @@ func TestExecuteCommandExit(t *testing.T) {
 		t.Errorf("got should exit=%t, want: should exit=true", shouldExit)
 	}
 }
+
+func TestExecuteCommandMine(t *testing.T) {
+	mine := Mine{Reserves: 5}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	shouldExit := executeCommand(&mine, Command{Name: "mine", MinerID: 101})
+	if shouldExit || mine.Reserves != 2 || mine.Coal != 3 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got should exit=%t, reserves=%d, coal=%d, and 1st miner energy=%d; want should exit=false, reserves=2, coal=3 and energy=0", shouldExit, mine.Reserves, mine.Coal, mine.Miners[101].Energy)
+	}
+}
+
+func TestExecuteCommandRest(t *testing.T) {
+	mine := Mine{Coal: 3, Reserves: 5}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0})
+	shouldExit := executeCommand(&mine, Command{Name: "rest", MinerID: 101})
+	if shouldExit || mine.Coal != 1 || mine.Reserves != 5 || mine.Miners[101].Energy != 1 {
+		t.Errorf("got should exit=%t, reserves=%d, coal=%d, and 1st miner energy=%d; want should exit=false, reserves=5, coal=1 and energy=1", shouldExit, mine.Reserves, mine.Coal, mine.Miners[101].Energy)
+	}
+}
