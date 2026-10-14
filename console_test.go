@@ -223,3 +223,21 @@ func TestRunConsoleMineAndRest(t *testing.T) {
 		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want coal=1, reserves=2 and energy=1", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
 	}
 }
+
+func TestRunConsoleContinuesAfterInvalidCommand(t *testing.T) {
+	mine := Mine{Reserves: 5}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+
+	in := strings.NewReader("hello\nmine 101\nexit\n")
+	var out bytes.Buffer
+
+	runConsole(in, &out, &mine)
+
+	if mine.Coal != 3 || mine.Reserves != 2 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want coal=3, reserves=2 and energy=0", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
+	}
+
+	if !strings.Contains(out.String(), "Ошибка команды:") {
+		t.Errorf("got output=%q; want command error message", out.String())
+	}
+}
