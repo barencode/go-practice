@@ -1,21 +1,14 @@
 package main
 
 import (
-	"os"
+	"fmt"
+	"net/http"
 )
 
 func main() {
-	team := map[int]*Miner{
-		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
-		205: nil,
-		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
+	http.HandleFunc("/health", healthHandler)
+	fmt.Println("Сервер: http://localhost:8080")
+	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
+		fmt.Println("Ошибка сервера:", err)
 	}
-
-	mine := Mine{
-		Miners:   team,
-		Closed:   false,
-		Reserves: 10,
-	}
-
-	runConsole(os.Stdin, os.Stdout, &mine)
 }
