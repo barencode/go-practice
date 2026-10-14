@@ -120,3 +120,32 @@ func executeCommand(out io.Writer, mine *Mine, command Command) bool {
 	}
 	return false
 }
+
+func runConsole(in io.Reader, out io.Writer, mine *Mine) {
+	scanner := bufio.NewScanner(in)
+
+	for {
+		fmt.Fprint(out, "Введите команду (mine <ID>, rest <ID>, status, exit, open, close): ")
+		input, err := readLine(scanner)
+		if errors.Is(err, io.EOF) {
+			return
+		}
+		if err != nil {
+			fmt.Fprintln(out, "Ошибка чтения:", err)
+			return
+		}
+
+		command, err := parseCommand(input)
+		if errors.Is(err, ErrEmptyCommand) {
+			continue
+		}
+		if err != nil {
+			fmt.Fprintln(out, "Ошибка команды:", err)
+			continue
+		}
+
+		if executeCommand(out, mine, command) {
+			return
+		}
+	}
+}

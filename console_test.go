@@ -209,3 +209,17 @@ func TestPrintMineSummaryWithMiners(t *testing.T) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }
+
+func TestRunConsoleMineAndRest(t *testing.T) {
+	mine := Mine{Reserves: 5}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+
+	in := strings.NewReader("mine 101\nrest 101\nexit\nmine 101\n")
+	var out bytes.Buffer
+
+	runConsole(in, &out, &mine)
+
+	if mine.Coal != 1 || mine.Reserves != 2 || mine.Miners[101].Energy != 1 {
+		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want coal=1, reserves=2 and energy=1", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
+	}
+}

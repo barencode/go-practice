@@ -1,10 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"errors"
-	"fmt"
-	"io"
 	"os"
 )
 
@@ -21,30 +17,5 @@ func main() {
 		Reserves: 10,
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for {
-		fmt.Print("Введите команду (mine <ID>, rest <ID>, status, exit, open, close): ")
-		input, err := readLine(scanner)
-		if errors.Is(err, io.EOF) {
-			return
-		}
-		if err != nil {
-			fmt.Println("Ошибка чтения:", err)
-			return
-		}
-
-		command, err := parseCommand(input)
-		if errors.Is(err, ErrEmptyCommand) {
-			continue
-		}
-		if err != nil {
-			fmt.Println("Ошибка команды:", err)
-			continue
-		}
-
-		if executeCommand(os.Stdout, &mine, command) {
-			return
-		}
-	}
+	runConsole(os.Stdin, os.Stdout, &mine)
 }
