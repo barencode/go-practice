@@ -16,6 +16,16 @@ type MineStatus struct {
 	Closed   bool `json:"closed"`
 }
 
+func newRouter(api API) *http.ServeMux {
+	router := http.NewServeMux()
+
+	router.HandleFunc("/health", healthHandler)
+	router.HandleFunc("/miner", api.minerHandler)
+	router.HandleFunc("/status", api.statusHandler)
+
+	return router
+}
+
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Шахта на связи")
 }
