@@ -125,3 +125,33 @@ func TestMinerHandlerMethodNotAllowed(t *testing.T) {
 		t.Errorf("got response code=%d and response header=%q; want 405 and Allow=\"GET\"", response.Code, response.Header().Get("Allow"))
 	}
 }
+
+func TestRouterMinerFound(t *testing.T) {
+	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	api := API{Mine: &mine}
+
+	router := newRouter(api)
+
+	request := httptest.NewRequest(http.MethodGet, "/miner?id=101", nil)
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, request)
+	contentType := response.Header().Get("Content-Type")
+
+	var got Miner
+	decoder := json.NewDecoder(response.Body)
+	if err := decoder.Decode(&got); err != nil {
+		t.Fatalf("decode response: %+v", err)
+	}
+
+	var want Miner
+	want = Miner{Name: "Борис", Energy: 2, Production: 3}
+
+	if got != want {
+		t.Errorf("got miner=%+v; want %+v", got, want)
+	}
+
+	if response.Code != http.StatusOK || contentType != "application/json" {
+		t.Errorf("got code=%d and content type=%q; want code=200 and \"application/json\"", response.Code, contentType)
+	}
+}

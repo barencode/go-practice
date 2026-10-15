@@ -10,12 +10,11 @@ func main() {
 	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
 	api := API{Mine: &mine}
 
-	http.HandleFunc("/status", api.statusHandler)
-	http.HandleFunc("/health", healthHandler)
-	http.HandleFunc("/miner", api.minerHandler)
+	router := newRouter(api)
+
 	fmt.Println("Сервер: http://localhost:8080")
 
-	if err := http.ListenAndServe("localhost:8080", nil); err != nil {
+	if err := http.ListenAndServe("localhost:8080", router); err != nil {
 		fmt.Println("Ошибка сервера:", err)
 	}
 }
