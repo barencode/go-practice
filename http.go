@@ -21,6 +21,12 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api API) statusHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		return
+	}
+
 	status := MineStatus{
 		Coal:     api.Mine.Coal,
 		Reserves: api.Mine.Reserves,
