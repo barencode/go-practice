@@ -8,7 +8,7 @@ import (
 func main() {
 	mine := Mine{Reserves: 10}
 	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
-	api := API{Mine: &mine}
+	api := &API{Mine: &mine}
 
 	router := newRouter(api)
 
