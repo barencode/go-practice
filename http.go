@@ -35,3 +35,26 @@ func (api API) statusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(status)
 }
+
+func (api API) minerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		return
+	}
+
+	input := r.URL.Query().Get("id")
+	id, err := parseMinerID(input)
+	if err != nil {
+		http.Error(w, "Ошибка запроса", http.StatusBadRequest)
+		return
+	}
+
+	miner, err := api.Mine.FindMiner(id)
+	if err != nil {
+		http.Error(w, "Шахтёр не найден", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(miner)
+}
