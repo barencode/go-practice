@@ -43,3 +43,16 @@ func TestStatusHandler(t *testing.T) {
 		t.Errorf("got code=%d and content type=%q; want code=200 and \"application/json\"", response.Code, contentType)
 	}
 }
+
+func TestStatusHandlerMethodNotAllowed(t *testing.T) {
+	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
+	api := API{Mine: &mine}
+
+	request := httptest.NewRequest(http.MethodPost, "/status", nil)
+	response := httptest.NewRecorder()
+	api.statusHandler(response, request)
+
+	if response.Code != http.StatusMethodNotAllowed || response.Header().Get("Allow") != http.MethodGet {
+		t.Errorf("got response code=%d and response header=%q; want 405 and Allow=\"GET\"", response.Code, response.Header().Get("Allow"))
+	}
+}
