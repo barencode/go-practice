@@ -27,12 +27,17 @@ type MineResponse struct {
 	Coal int `json:"coal"`
 }
 
+type RestRequest struct {
+	MinerID int `json:"miner_id"`
+}
+
 func newRouter(api *API) *http.ServeMux {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/health", healthHandler)
 	router.HandleFunc("/mine", api.mineHandler)
 	router.HandleFunc("/miner", api.minerHandler)
+	router.HandleFunc("/rest", api.restHandler)
 	router.HandleFunc("/status", api.statusHandler)
 
 	return router
@@ -118,4 +123,37 @@ func (api *API) mineHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(MineResponse{Coal: coal})
+}
+
+func (api *API) restHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var input RestRequest
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Ошибка запроса", http.StatusBadRequest)
+		return
+	}
+
+	api.mtx.Lock()
+	defer api.mtx.Unlock()
+
+	err = api.Mine.RestMiner(input.MinerID)
+	if errors.Is(err, ErrMinerNotFound) {
+		http.Error(w, "Шахтёр не найден", http.StatusNotFound)
+		return
+	} else if errors.Is(err, ErrNotEnoughCoal) {
+		http.Error(w, "Недостаточно угля", http.StatusConflict)
+		return
+	} else if err != nil {
+		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(RestRequest{MinerID: input.MinerID})
 }
