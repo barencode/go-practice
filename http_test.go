@@ -282,3 +282,55 @@ func TestMineRouterMethodNotAllowed(t *testing.T) {
 		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want 4, 5 and 1", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
 	}
 }
+
+func TestRouterMineRestAndMine(t *testing.T) {
+	mine := Mine{Reserves: 10}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	api := &API{Mine: &mine}
+	router := newRouter(api)
+
+	for _, path := range []string{"/mine", "/rest", "/mine"} {
+		body := strings.NewReader(`{"miner_id":101}`)
+		request := httptest.NewRequest(http.MethodPost, path, body)
+		request.Header.Set("Content-Type", "application/json")
+		response := httptest.NewRecorder()
+
+		router.ServeHTTP(response, request)
+
+		if response.Code != http.StatusOK {
+			t.Fatalf("POST %s: got code=%d, body=%q; want 200", path, response.Code, response.Body.String())
+		}
+	}
+
+	if mine.Coal != 4 || mine.Reserves != 4 || mine.Miners[101].Energy != 1 {
+		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want 4, 4, and 1", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
+	}
+}
+
+func TestRestRouterNotEnoughCoal(t *testing.T) {
+	mine := Mine{Coal: 1, Reserves: 5}
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0, Production: 3})
+	api := &API{Mine: &mine}
+	router := newRouter(api)
+
+	path := "/rest"
+	body := strings.NewReader(`{"miner_id":101}`)
+	request := httptest.NewRequest(http.MethodPost, path, body)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusConflict {
+		t.Fatalf("POST %s: got code=%d, body=%q; want 409", path, response.Code, response.Body.String())
+	}
+
+	if response.Body.String() != "Недостаточно угля\n" {
+		t.Errorf("got body=%q; want %q",
+			response.Body.String(), "Недостаточно угля\n")
+	}
+
+	if mine.Coal != 1 || mine.Reserves != 5 || mine.Miners[101].Energy != 0 {
+		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want 1, 5 and 0", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
+	}
+}
