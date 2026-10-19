@@ -334,3 +334,24 @@ func TestRestRouterNotEnoughCoal(t *testing.T) {
 		t.Errorf("got coal=%d, reserves=%d and 1st miner energy=%d; want 1, 5 and 0", mine.Coal, mine.Reserves, mine.Miners[101].Energy)
 	}
 }
+
+func TestNewAPINil(t *testing.T) {
+	api, err := newAPI(nil)
+
+	if api != nil || err == nil {
+		t.Errorf("got api=%v and error=%v; want nil and not-nil error", api, err)
+	}
+}
+
+func TestNewAPISuccess(t *testing.T) {
+	mine := &Mine{}
+	api, err := newAPI(mine)
+
+	if api == nil || err != nil {
+		t.Fatalf("got api=%v and error=%v; want non-nil and nil error", api, err)
+	}
+
+	if api.Mine != mine {
+		t.Errorf("got mine pointer=%p; want %p", api.Mine, mine)
+	}
+}

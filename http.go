@@ -31,6 +31,13 @@ type RestRequest struct {
 	MinerID int `json:"miner_id"`
 }
 
+func newAPI(mine *Mine) (*API, error) {
+	if mine == nil {
+		return nil, errors.New("шахта не задана")
+	}
+	return &API{Mine: mine}, nil
+}
+
 func newRouter(api *API) *http.ServeMux {
 	router := http.NewServeMux()
 
