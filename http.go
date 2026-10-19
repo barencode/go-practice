@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+
+	"github.com/barencode/go-practice/internal/mining"
 )
 
 type API struct {
-	Mine *Mine
+	Mine *mining.Mine
 	mtx  sync.Mutex
 }
 
@@ -31,7 +33,7 @@ type RestRequest struct {
 	MinerID int `json:"miner_id"`
 }
 
-func newAPI(mine *Mine) (*API, error) {
+func newAPI(mine *mining.Mine) (*API, error) {
 	if mine == nil {
 		return nil, errors.New("шахта не задана")
 	}
@@ -117,10 +119,10 @@ func (api *API) mineHandler(w http.ResponseWriter, r *http.Request) {
 	defer api.mtx.Unlock()
 
 	coal, err := api.Mine.MineByID(input.MinerID)
-	if errors.Is(err, ErrMineClosed) {
+	if errors.Is(err, mining.ErrMineClosed) {
 		http.Error(w, "Шахта закрыта", http.StatusConflict)
 		return
-	} else if errors.Is(err, ErrMinerNotFound) {
+	} else if errors.Is(err, mining.ErrMinerNotFound) {
 		http.Error(w, "Шахтёр не найден", http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -150,10 +152,10 @@ func (api *API) restHandler(w http.ResponseWriter, r *http.Request) {
 	defer api.mtx.Unlock()
 
 	err = api.Mine.RestMiner(input.MinerID)
-	if errors.Is(err, ErrMinerNotFound) {
+	if errors.Is(err, mining.ErrMinerNotFound) {
 		http.Error(w, "Шахтёр не найден", http.StatusNotFound)
 		return
-	} else if errors.Is(err, ErrNotEnoughCoal) {
+	} else if errors.Is(err, mining.ErrNotEnoughCoal) {
 		http.Error(w, "Недостаточно угля", http.StatusConflict)
 		return
 	} else if err != nil {

@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/barencode/go-practice/internal/mining"
 )
 
 func TestHealthHandler(t *testing.T) {
@@ -20,7 +22,7 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestStatusHandler(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine := mining.Mine{Coal: 4, Reserves: 7, Closed: true}
 	api := &API{Mine: &mine}
 
 	request := httptest.NewRequest(http.MethodGet, "/status", nil)
@@ -46,7 +48,7 @@ func TestStatusHandler(t *testing.T) {
 }
 
 func TestStatusHandlerMethodNotAllowed(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine := mining.Mine{Coal: 4, Reserves: 7, Closed: true}
 	api := &API{Mine: &mine}
 
 	request := httptest.NewRequest(http.MethodPost, "/status", nil)
@@ -59,8 +61,8 @@ func TestStatusHandlerMethodNotAllowed(t *testing.T) {
 }
 
 func TestMinerHandlerFound(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
 	api := &API{Mine: &mine}
 
 	request := httptest.NewRequest(http.MethodGet, "/miner?id=101", nil)
@@ -68,14 +70,14 @@ func TestMinerHandlerFound(t *testing.T) {
 	api.minerHandler(response, request)
 	contentType := response.Header().Get("Content-Type")
 
-	var got Miner
+	var got mining.Miner
 	decoder := json.NewDecoder(response.Body)
 	if err := decoder.Decode(&got); err != nil {
 		t.Fatalf("decode response: %+v", err)
 	}
 
-	var want Miner
-	want = Miner{Name: "Борис", Energy: 2, Production: 3}
+	var want mining.Miner
+	want = mining.Miner{Name: "Борис", Energy: 2, Production: 3}
 
 	if got != want {
 		t.Errorf("got miner=%+v; want %+v", got, want)
@@ -87,7 +89,7 @@ func TestMinerHandlerFound(t *testing.T) {
 }
 
 func TestMinerHandlerNotFound(t *testing.T) {
-	mine := Mine{Coal: 0, Reserves: 1, Closed: true}
+	mine := mining.Mine{Coal: 0, Reserves: 1, Closed: true}
 	api := &API{Mine: &mine}
 
 	request := httptest.NewRequest(http.MethodGet, "/miner?id=999", nil)
@@ -100,7 +102,7 @@ func TestMinerHandlerNotFound(t *testing.T) {
 }
 
 func TestMinerHandlerInvalidID(t *testing.T) {
-	mine := Mine{Coal: 0, Reserves: 1, Closed: true}
+	mine := mining.Mine{Coal: 0, Reserves: 1, Closed: true}
 	api := &API{Mine: &mine}
 	params := []string{"/miner", "/miner?id=abc"}
 	for _, param := range params {
@@ -115,7 +117,7 @@ func TestMinerHandlerInvalidID(t *testing.T) {
 }
 
 func TestMinerHandlerMethodNotAllowed(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine := mining.Mine{Coal: 4, Reserves: 7, Closed: true}
 	api := &API{Mine: &mine}
 
 	request := httptest.NewRequest(http.MethodPost, "/miner?id=101", nil)
@@ -128,8 +130,8 @@ func TestMinerHandlerMethodNotAllowed(t *testing.T) {
 }
 
 func TestRouterMinerFound(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 7, Closed: true}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 7, Closed: true}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -138,14 +140,14 @@ func TestRouterMinerFound(t *testing.T) {
 	router.ServeHTTP(response, request)
 	contentType := response.Header().Get("Content-Type")
 
-	var got Miner
+	var got mining.Miner
 	decoder := json.NewDecoder(response.Body)
 	if err := decoder.Decode(&got); err != nil {
 		t.Fatalf("decode response: %+v", err)
 	}
 
-	var want Miner
-	want = Miner{Name: "Борис", Energy: 2, Production: 3}
+	var want mining.Miner
+	want = mining.Miner{Name: "Борис", Energy: 2, Production: 3}
 
 	if got != want {
 		t.Errorf("got miner=%+v; want %+v", got, want)
@@ -157,8 +159,8 @@ func TestRouterMinerFound(t *testing.T) {
 }
 
 func TestMineRouterSuccess(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -188,8 +190,8 @@ func TestMineRouterSuccess(t *testing.T) {
 }
 
 func TestMineRouterClosed(t *testing.T) {
-	mine := Mine{Closed: true, Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Closed: true, Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -213,8 +215,8 @@ func TestMineRouterClosed(t *testing.T) {
 }
 
 func TestMineRouterInvalidJSON(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -238,8 +240,8 @@ func TestMineRouterInvalidJSON(t *testing.T) {
 }
 
 func TestMineRouterNotFound(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -263,8 +265,8 @@ func TestMineRouterNotFound(t *testing.T) {
 }
 
 func TestMineRouterMethodNotAllowed(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -284,8 +286,8 @@ func TestMineRouterMethodNotAllowed(t *testing.T) {
 }
 
 func TestRouterMineRestAndMine(t *testing.T) {
-	mine := Mine{Reserves: 10}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	mine := mining.Mine{Reserves: 10}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -308,8 +310,8 @@ func TestRouterMineRestAndMine(t *testing.T) {
 }
 
 func TestRestRouterNotEnoughCoal(t *testing.T) {
-	mine := Mine{Coal: 1, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0, Production: 3})
+	mine := mining.Mine{Coal: 1, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 0, Production: 3})
 	api := &API{Mine: &mine}
 	router := newRouter(api)
 
@@ -344,7 +346,7 @@ func TestNewAPINil(t *testing.T) {
 }
 
 func TestNewAPISuccess(t *testing.T) {
-	mine := &Mine{}
+	mine := &mining.Mine{}
 	api, err := newAPI(mine)
 
 	if api == nil || err != nil {

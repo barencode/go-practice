@@ -1,5 +1,7 @@
 package main
 
+import "github.com/barencode/go-practice/internal/mining"
+
 func mineShifts(shifts int, maintenanceShift int, production int) int {
 	if shifts <= 0 || production <= 0 {
 		return 0
@@ -40,7 +42,7 @@ func buildProduction(shifts int, maintenanceShift int, coalPerShift int) []int {
 	return production
 }
 
-func mineRound(miners []Miner) int {
+func mineRound(miners []mining.Miner) int {
 	balance := 0
 
 	for i := range miners {
@@ -50,7 +52,7 @@ func mineRound(miners []Miner) int {
 	return balance
 }
 
-func findMinerIndex(miners []Miner, name string) int {
+func findMinerIndex(miners []mining.Miner, name string) int {
 	for i, miner := range miners {
 		if name == miner.Name {
 			return i
@@ -59,7 +61,7 @@ func findMinerIndex(miners []Miner, name string) int {
 	return -1
 }
 
-func mineMapRound(miners map[int]*Miner) int {
+func mineMapRound(miners map[int]*mining.Miner) int {
 	amount := 0
 	for _, miner := range miners {
 		if miner != nil {

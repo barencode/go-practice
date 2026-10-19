@@ -7,6 +7,8 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/barencode/go-practice/internal/mining"
 )
 
 type Command struct {
@@ -14,7 +16,7 @@ type Command struct {
 	MinerID int
 }
 
-func printMineSummary(out io.Writer, mine *Mine) {
+func printMineSummary(out io.Writer, mine *mining.Mine) {
 	fmt.Fprintf(out, "На складе: %d, в залежах: %d, шахта закрыта: %t\n", mine.Coal, mine.Reserves, mine.Closed)
 
 	ids := mine.MinerIDs()
@@ -69,18 +71,18 @@ func parseCommand(input string) (Command, error) {
 	}
 }
 
-func executeCommand(out io.Writer, mine *Mine, command Command) bool {
+func executeCommand(out io.Writer, mine *mining.Mine, command Command) bool {
 	switch command.Name {
 	case "mine":
 		id := command.MinerID
 		fmt.Fprintf(out, "Ищем шахтёра с ID: %d\n", id)
 		coal, err := mine.MineByID(id)
 		if err != nil {
-			if errors.Is(err, ErrMineClosed) {
+			if errors.Is(err, mining.ErrMineClosed) {
 				fmt.Fprintf(out, "Добыча остановлена\n")
 				return false
 			}
-			if errors.Is(err, ErrMinerNotFound) {
+			if errors.Is(err, mining.ErrMinerNotFound) {
 				fmt.Fprintf(out, "Выберите другого шахтёра\n")
 				return false
 			}
@@ -94,11 +96,11 @@ func executeCommand(out io.Writer, mine *Mine, command Command) bool {
 		fmt.Fprintf(out, "Ищем шахтёра с ID: %d\n", id)
 		err := mine.RestMiner(id)
 		if err != nil {
-			if errors.Is(err, ErrMinerNotFound) {
+			if errors.Is(err, mining.ErrMinerNotFound) {
 				fmt.Fprintf(out, "Выберите другого шахтёра\n")
 				return false
 			}
-			if errors.Is(err, ErrNotEnoughCoal) {
+			if errors.Is(err, mining.ErrNotEnoughCoal) {
 				fmt.Fprintf(out, "Недостаточно угля\n")
 				return false
 			}
@@ -121,7 +123,7 @@ func executeCommand(out io.Writer, mine *Mine, command Command) bool {
 	return false
 }
 
-func runConsole(in io.Reader, out io.Writer, mine *Mine) {
+func runConsole(in io.Reader, out io.Writer, mine *mining.Mine) {
 	scanner := bufio.NewScanner(in)
 
 	for {

@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/barencode/go-practice/internal/mining"
+)
 
 type RoundExpectation struct {
 	Production  int
@@ -122,7 +126,7 @@ func TestBuildProductionWithoutMaintenance(t *testing.T) {
 }
 
 func TestMineRound(t *testing.T) {
-	miners := []Miner{
+	miners := []mining.Miner{
 		{Name: "Борис", Energy: 2, Production: 3},
 		{Name: "Анна", Energy: 1, Production: 5},
 	}
@@ -139,7 +143,7 @@ func TestMineRound(t *testing.T) {
 }
 
 func TestMineRoundUntilExhausted(t *testing.T) {
-	team := []Miner{
+	team := []mining.Miner{
 		{Name: "Борис", Energy: 2, Production: 3},
 		{Name: "Анна", Energy: 1, Production: 5},
 	}
@@ -165,7 +169,7 @@ func TestMineRoundUntilExhausted(t *testing.T) {
 }
 
 func TestFindMinerIndex(t *testing.T) {
-	team := []Miner{
+	team := []mining.Miner{
 		{Name: "Борис", Energy: 2, Production: 3},
 		{Name: "Анна", Energy: 1, Production: 5},
 		{Name: "Борис", Energy: 4, Production: 2},
@@ -180,7 +184,7 @@ func TestFindMinerIndex(t *testing.T) {
 }
 
 func TestFindMinerIndexNotFound(t *testing.T) {
-	team := []Miner{
+	team := []mining.Miner{
 		{Name: "Борис", Energy: 2, Production: 3},
 		{Name: "Анна", Energy: 1, Production: 5},
 	}
@@ -194,10 +198,10 @@ func TestFindMinerIndexNotFound(t *testing.T) {
 }
 
 func TestMineMapRound(t *testing.T) {
-	team := map[int]*Miner{
-		101: &Miner{Name: "Борис", Energy: 2, Production: 3},
+	team := map[int]*mining.Miner{
+		101: &mining.Miner{Name: "Борис", Energy: 2, Production: 3},
 		205: nil,
-		309: &Miner{Name: "Анна", Energy: 1, Production: 5},
+		309: &mining.Miner{Name: "Анна", Energy: 1, Production: 5},
 	}
 	got := mineMapRound(team)
 	wantAmount := 8

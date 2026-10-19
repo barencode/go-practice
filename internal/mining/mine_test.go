@@ -1,4 +1,4 @@
-package main
+package mining
 
 import (
 	"errors"
@@ -102,7 +102,7 @@ func TestMineByIDClosedNotFound(t *testing.T) {
 
 func TestAddMinerInitializesMap(t *testing.T) {
 	var mine Mine
-	boris := &Miner{"Борис", 2, 3}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
 	mine.AddMiner(101, boris)
 	got := mine.Miners[101]
 	if len(mine.Miners) != 1 || got != boris {
@@ -112,8 +112,8 @@ func TestAddMinerInitializesMap(t *testing.T) {
 
 func TestAddMinerPreservesExisting(t *testing.T) {
 	var mine Mine
-	boris := &Miner{"Борис", 2, 3}
-	anna := &Miner{"Анна", 3, 2}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
+	anna := &Miner{Name: "Анна", Energy: 3, Production: 2}
 	mine.AddMiner(101, boris)
 	mine.AddMiner(205, anna)
 	got := mine.Miners
@@ -124,8 +124,8 @@ func TestAddMinerPreservesExisting(t *testing.T) {
 
 func TestAddMinerReplacesExisting(t *testing.T) {
 	var mine Mine
-	boris := &Miner{"Борис", 2, 3}
-	anna := &Miner{"Анна", 3, 2}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
+	anna := &Miner{Name: "Анна", Energy: 3, Production: 2}
 	mine.AddMiner(101, boris)
 	mine.AddMiner(101, anna)
 	got := mine.Miners
@@ -137,8 +137,8 @@ func TestAddMinerReplacesExisting(t *testing.T) {
 
 func TestRemoveMinerExisting(t *testing.T) {
 	var mine Mine
-	boris := &Miner{"Борис", 2, 3}
-	anna := &Miner{"Анна", 3, 2}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
+	anna := &Miner{Name: "Анна", Energy: 3, Production: 2}
 	mine.AddMiner(101, boris)
 	mine.AddMiner(205, anna)
 	err := mine.RemoveMiner(101)
@@ -172,7 +172,7 @@ func TestRemoveMinerNotFound(t *testing.T) {
 
 func TestFindMinerExisting(t *testing.T) {
 	var mine Mine
-	boris := &Miner{"Борис", 2, 3}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
 	mine.AddMiner(101, boris)
 	miner, err := mine.FindMiner(101)
 
@@ -203,7 +203,7 @@ func TestFindMinerNilValue(t *testing.T) {
 func TestFindMinerWhenClosed(t *testing.T) {
 	var mine Mine
 	mine.Closed = true
-	boris := &Miner{"Борис", 2, 3}
+	boris := &Miner{Name: "Борис", Energy: 2, Production: 3}
 	mine.AddMiner(101, boris)
 	miner, err := mine.FindMiner(101)
 
@@ -214,7 +214,7 @@ func TestFindMinerWhenClosed(t *testing.T) {
 
 func TestMineByIDAccumulatesCoal(t *testing.T) {
 	mine := Mine{Coal: 10, Reserves: 9}
-	mine.AddMiner(101, &Miner{"Борис", 2, 3})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
 
 	shiftProduction, err := mine.MineByID(101)
 	if shiftProduction != 3 || mine.Coal != 13 || err != nil {
@@ -271,7 +271,7 @@ func TestSpendCoalInvalidAmount(t *testing.T) {
 
 func TestRestMinerSuccess(t *testing.T) {
 	mine := Mine{Closed: true, Coal: 5}
-	mine.AddMiner(101, &Miner{"Борис", 0, 3})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0, Production: 3})
 	err := mine.RestMiner(101)
 
 	if err != nil || mine.Coal != 3 || mine.Miners[101].Energy != 1 {
@@ -281,7 +281,7 @@ func TestRestMinerSuccess(t *testing.T) {
 
 func TestRestMinerNotEnoughCoal(t *testing.T) {
 	mine := Mine{Closed: true, Coal: 1}
-	mine.AddMiner(101, &Miner{"Борис", 0, 3})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0, Production: 3})
 	err := mine.RestMiner(101)
 
 	if !errors.Is(err, ErrNotEnoughCoal) || mine.Coal != 1 || mine.Miners[101].Energy != 0 {
@@ -300,7 +300,7 @@ func TestRestMinerNotFound(t *testing.T) {
 
 func TestMineRestAndMineAgain(t *testing.T) {
 	mine := Mine{Closed: false, Coal: 0, Reserves: 6} // for MineByID mine MUST be !Closed
-	mine.AddMiner(101, &Miner{"Борис", 1, 3})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
 	coal, err := mine.MineByID(101) // perf 3, coal 3, energy 0
 
 	if err != nil || coal != 3 || mine.Coal != 3 || mine.Miners[101].Energy != 0 {
@@ -319,7 +319,7 @@ func TestMineRestAndMineAgain(t *testing.T) {
 func TestMinerIDs(t *testing.T) {
 	mine := Mine{}
 	mine.AddMiner(205, nil)
-	mine.AddMiner(101, &Miner{"Борис", 3, 2})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 3, Production: 2})
 	got := mine.MinerIDs()
 	if len(got) != 2 {
 		t.Fatalf("got %d members; want 2", len(got))
@@ -340,7 +340,7 @@ func TestMinerIDsEmpty(t *testing.T) {
 
 func TestMineByIDPartialReserves(t *testing.T) {
 	mine := Mine{Coal: 10, Reserves: 2}
-	mine.AddMiner(101, &Miner{"Борис", 2, 3})
+	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
 	got, err := mine.MineByID(101)
 
 	if got != 2 || mine.Coal != 12 || mine.Reserves != 0 || mine.Miners[101].Energy != 1 || err != nil {

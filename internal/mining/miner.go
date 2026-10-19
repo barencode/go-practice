@@ -1,4 +1,4 @@
-package main
+package mining
 
 type Miner struct {
 	Name       string
