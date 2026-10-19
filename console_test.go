@@ -7,6 +7,8 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/barencode/go-practice/internal/mining"
 )
 
 func TestParseMinerIDWithSpaces(t *testing.T) {
@@ -127,7 +129,7 @@ func TestParseCommandOpenClose(t *testing.T) {
 }
 
 func TestExecuteCommandClose(t *testing.T) {
-	mine := Mine{Closed: false}
+	mine := mining.Mine{Closed: false}
 	shouldExit := executeCommand(io.Discard, &mine, Command{Name: "close"})
 	if !mine.Closed || shouldExit {
 		t.Errorf("got closed=%t, should exit=%t, want: closed=true and should exit=false", mine.Closed, shouldExit)
@@ -135,7 +137,7 @@ func TestExecuteCommandClose(t *testing.T) {
 }
 
 func TestExecuteCommandOpen(t *testing.T) {
-	mine := Mine{Closed: true}
+	mine := mining.Mine{Closed: true}
 	shouldExit := executeCommand(io.Discard, &mine, Command{Name: "open"})
 	if mine.Closed || shouldExit {
 		t.Errorf("got closed=%t, should exit=%t, want: closed=false and should exit=false", mine.Closed, shouldExit)
@@ -143,7 +145,7 @@ func TestExecuteCommandOpen(t *testing.T) {
 }
 
 func TestExecuteCommandExit(t *testing.T) {
-	mine := Mine{}
+	mine := mining.Mine{}
 	shouldExit := executeCommand(io.Discard, &mine, Command{Name: "exit"})
 	if !shouldExit {
 		t.Errorf("got should exit=%t, want: should exit=true", shouldExit)
@@ -151,8 +153,8 @@ func TestExecuteCommandExit(t *testing.T) {
 }
 
 func TestExecuteCommandMine(t *testing.T) {
-	mine := Mine{Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	shouldExit := executeCommand(io.Discard, &mine, Command{Name: "mine", MinerID: 101})
 	if shouldExit || mine.Reserves != 2 || mine.Coal != 3 || mine.Miners[101].Energy != 0 {
 		t.Errorf("got should exit=%t, reserves=%d, coal=%d, and 1st miner energy=%d; want should exit=false, reserves=2, coal=3 and energy=0", shouldExit, mine.Reserves, mine.Coal, mine.Miners[101].Energy)
@@ -160,8 +162,8 @@ func TestExecuteCommandMine(t *testing.T) {
 }
 
 func TestExecuteCommandRest(t *testing.T) {
-	mine := Mine{Coal: 3, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 0})
+	mine := mining.Mine{Coal: 3, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 0})
 	shouldExit := executeCommand(io.Discard, &mine, Command{Name: "rest", MinerID: 101})
 	if shouldExit || mine.Coal != 1 || mine.Reserves != 5 || mine.Miners[101].Energy != 1 {
 		t.Errorf("got should exit=%t, reserves=%d, coal=%d, and 1st miner energy=%d; want should exit=false, reserves=5, coal=1 and energy=1", shouldExit, mine.Reserves, mine.Coal, mine.Miners[101].Energy)
@@ -169,8 +171,8 @@ func TestExecuteCommandRest(t *testing.T) {
 }
 
 func TestExecuteCommandMineClosed(t *testing.T) {
-	mine := Mine{Closed: true, Coal: 4, Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Closed: true, Coal: 4, Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 	var out bytes.Buffer
 	shouldExit := executeCommand(&out, &mine, Command{Name: "mine", MinerID: 101})
 	if shouldExit || mine.Coal != 4 || mine.Reserves != 5 || mine.Miners[101].Energy != 1 {
@@ -183,7 +185,7 @@ func TestExecuteCommandMineClosed(t *testing.T) {
 }
 
 func TestPrintMineSummaryEmpty(t *testing.T) {
-	mine := Mine{Coal: 4, Reserves: 5, Closed: true}
+	mine := mining.Mine{Coal: 4, Reserves: 5, Closed: true}
 	var out bytes.Buffer
 
 	printMineSummary(&out, &mine)
@@ -195,9 +197,9 @@ func TestPrintMineSummaryEmpty(t *testing.T) {
 }
 
 func TestPrintMineSummaryWithMiners(t *testing.T) {
-	mine := Mine{}
+	mine := mining.Mine{}
 	mine.AddMiner(205, nil)
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
 	var out bytes.Buffer
 
 	printMineSummary(&out, &mine)
@@ -211,8 +213,8 @@ func TestPrintMineSummaryWithMiners(t *testing.T) {
 }
 
 func TestRunConsoleMineAndRest(t *testing.T) {
-	mine := Mine{Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 
 	in := strings.NewReader("mine 101\nrest 101\nexit\nmine 101\n")
 	var out bytes.Buffer
@@ -225,8 +227,8 @@ func TestRunConsoleMineAndRest(t *testing.T) {
 }
 
 func TestRunConsoleContinuesAfterInvalidCommand(t *testing.T) {
-	mine := Mine{Reserves: 5}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 1, Production: 3})
+	mine := mining.Mine{Reserves: 5}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 1, Production: 3})
 
 	in := strings.NewReader("hello\nmine 101\nexit\n")
 	var out bytes.Buffer

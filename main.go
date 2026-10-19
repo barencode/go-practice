@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/barencode/go-practice/internal/mining"
 )
 
 func main() {
-	mine := Mine{Reserves: 10}
-	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
+	mine := mining.Mine{Reserves: 10}
+	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
 	api, err := newAPI(&mine)
 	if err != nil {
 		fmt.Println("Ошибка создания API:", err)
