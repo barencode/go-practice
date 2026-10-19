@@ -8,7 +8,11 @@ import (
 func main() {
 	mine := Mine{Reserves: 10}
 	mine.AddMiner(101, &Miner{Name: "Борис", Energy: 2, Production: 3})
-	api := &API{Mine: &mine}
+	api, err := newAPI(&mine)
+	if err != nil {
+		fmt.Println("Ошибка создания API:", err)
+		return
+	}
 
 	router := newRouter(api)
 
