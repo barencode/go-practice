@@ -1,10 +1,12 @@
-package main
+package httpapi
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/barencode/go-practice/internal/mining"
@@ -33,14 +35,14 @@ type RestRequest struct {
 	MinerID int `json:"miner_id"`
 }
 
-func newAPI(mine *mining.Mine) (*API, error) {
+func NewAPI(mine *mining.Mine) (*API, error) {
 	if mine == nil {
 		return nil, errors.New("шахта не задана")
 	}
 	return &API{Mine: mine}, nil
 }
 
-func newRouter(api *API) *http.ServeMux {
+func NewRouter(api *API) *http.ServeMux {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/health", healthHandler)
@@ -83,7 +85,7 @@ func (api *API) minerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input := r.URL.Query().Get("id")
-	id, err := parseMinerID(input)
+	id, err := strconv.Atoi(strings.TrimSpace(input))
 	if err != nil {
 		http.Error(w, "Ошибка запроса", http.StatusBadRequest)
 		return
