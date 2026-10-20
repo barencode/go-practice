@@ -3,3 +3,10 @@
 Изучаю Go: упражнения, повторение и практика Git
 
 Первый коммит создан. Учусь сохранять изменения осознанно.
+
+- Запуск базы: docker compose up -d.
+- Первоначальное создание таблиц: две команды применения SQL-файлов, сначала 001, затем 002.
+    - docker compose exec -T db psql -U mining -d mining < migrations/001_create_mines.up.sql
+    - docker compose exec -T db psql -U mining -d mining < migrations/002_create_miners.up.sql
+- Подключение: docker compose exec db psql -U mining -d mining.
+- Остановка: docker compose down, при которой данные в именованном томе сохраняются.
