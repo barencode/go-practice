@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: mining
+      POSTGRES_USER: mining
+      POSTGRES_PASSWORD: mining_dev
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
