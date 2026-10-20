@@ -10,3 +10,5 @@
     - docker compose exec -T db psql -U mining -d mining < migrations/002_create_miners.up.sql
 - Подключение: docker compose exec db psql -U mining -d mining.
 - Остановка: docker compose down, при которой данные в именованном томе сохраняются.
+
+- Запуск сервера: DATABASE_URL='postgres://mining:mining_dev@127.0.0.1:5432/mining?sslmode=disable' go run .
