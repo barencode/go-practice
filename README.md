@@ -8,6 +8,8 @@
 - Первоначальное создание таблиц: две команды применения SQL-файлов, сначала 001, затем 002.
     - docker compose exec -T db psql -U mining -d mining < migrations/001_create_mines.up.sql
     - docker compose exec -T db psql -U mining -d mining < migrations/002_create_miners.up.sql
+- Начальное наполнение: docker compose exec -T db psql -U mining -d mining -v ON_ERROR_STOP=1 < scripts/seed.sql
+- Данные загружаются при запуске сохранение данных по HTTP TBD
 - Подключение: docker compose exec db psql -U mining -d mining.
 - Остановка: docker compose down, при которой данные в именованном томе сохраняются.
 

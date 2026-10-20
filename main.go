@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/barencode/go-practice/internal/httpapi"
-	"github.com/barencode/go-practice/internal/mining"
 	"github.com/barencode/go-practice/internal/postgres"
 )
 
@@ -30,14 +29,19 @@ func main() {
 
 	fmt.Println("PostgreSQL подключён")
 
-	mine := mining.Mine{Reserves: 10}
-	mine.AddMiner(101, &mining.Miner{Name: "Борис", Energy: 2, Production: 3})
-	api, err := httpapi.NewAPI(&mine)
+	loadCtx, loadCancel := context.WithTimeout(context.Background(), time.Second*5)
+	mine, err := postgres.LoadMine(loadCtx, pool, 1)
+	loadCancel()
+	if err != nil {
+		fmt.Println("Ошибка загрузки шахты:", err)
+		return
+	}
+
+	api, err := httpapi.NewAPI(mine)
 	if err != nil {
 		fmt.Println("Ошибка создания API:", err)
 		return
 	}
-
 	router := httpapi.NewRouter(api)
 
 	fmt.Println("Сервер: http://localhost:8080")
